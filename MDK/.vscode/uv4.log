@@ -1,0 +1,18 @@
+*** Using Compiler 'V6.23', folder: 'C:\Users\ww436\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
+*** Warning: You are compiling one or more files of source type C++ and have selected 'use MicroLIB'. MicroLIB does not support C++!
+  
+Build target 'LCDDEMO_Debug'
+source/main.c(180): warning: illegal character encoding in string literal [-Winvalid-source-encoding]
+  180 |    DDL_Printf("<C4><E3><BA><C3>!!\r\n");
+      |                ^~~~~~~~~~~~~~~~
+source/main.c(181): error: use of undeclared identifier 'èè'
+  181 |          DDL_Printf(èè);
+      |                     ^
+source/main.c(184): warning: illegal character encoding in string literal [-Winvalid-source-encoding]
+  184 |         char maomao[]="<C4><E3><BA><C3>";
+      |                        ^~~~~~~~~~~~~~~~
+2 warnings and 1 error generated.
+compiling main.c...
+".\output\debug\LCDDEMO.axf" - 1 Error(s), 2 Warning(s).
+Target not created.
+Build Time Elapsed:  00:00:09
