@@ -27,6 +27,7 @@
 //#include "lv_port_indev_template.h"
 #include "lcd_init.h" 
 #include "lcd.h" 
+#include "SH367303.h"
 
 /*******************************************************************************
  * Local type definitions ('typedef')
@@ -207,10 +208,9 @@ int32_t main(void)
     App_PortCfg();
 	
 	PrintfInit();
-	
+I2C_init();
 
 
-	
     /* Register write protected for some required peripherals. */
 //    LL_PERIPH_WP(LL_PERIPH_ALL);
 	LCD_Init ();
@@ -280,8 +280,8 @@ loadScreen(SCREEN_ID_MAIN );
 //lv_indev_set_group(indev, groups.zu1);
 
 //lv_group_set_editing(group, true);
+	I2C_WriteRegByte(SH_ADDR_WRITE,SH_SCONF3,0b00010100);
 
-RTOS_START();
 
     for (;;) {
 

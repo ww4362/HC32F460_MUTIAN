@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>__DEBUG,HC32F460,USE_DDL_DRIVER,</Define>
               <Undefine></Undefine>
-              <IncludePath>.\common;.\source;.\driver\inc;..\Hardware;..\middlewares\lvgl;..\middlewares\lvgl\src;..\middlewares\lvgl\examples\porting;..\middlewares\lvgl\examples\;..\middlewares;..\middlewares\lvgl\demos;..\middlewares\lvgl\demos\widgets;..\eez\src\ui;..\eezfolw\src\ui;.\source\eez\src\ui;.\source\FreeRTOS-Kernel\include;.\source\FreeRTOS-Kernel\portable;.\source\FreeRTOS-Kernel</IncludePath>
+              <IncludePath>.\common;.\source;.\driver\inc;..\Hardware;..\middlewares\lvgl;..\middlewares\lvgl\src;..\middlewares\lvgl\examples\porting;..\middlewares\lvgl\examples\;..\middlewares;..\middlewares\lvgl\demos;..\middlewares\lvgl\demos\widgets;..\eez\src\ui;..\eezfolw\src\ui;.\source\eez\src\ui;.\source\FreeRTOS-Kernel\include;.\source\FreeRTOS-Kernel\portable;.\source\FreeRTOS-Kernel;.\source\SH367303</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -613,116 +613,16 @@
               <FileType>5</FileType>
               <FilePath>.\source\eez\src\ui\vars.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_font_7px__.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\eez\src\ui\ui_font_7px__.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>RTOS/include</GroupName>
           <Files>
-            <File>
-              <FileName>atomic.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\atomic.h</FilePath>
-            </File>
-            <File>
-              <FileName>croutine.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\croutine.h</FilePath>
-            </File>
-            <File>
-              <FileName>deprecated_definitions.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\deprecated_definitions.h</FilePath>
-            </File>
-            <File>
-              <FileName>event_groups.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\event_groups.h</FilePath>
-            </File>
-            <File>
-              <FileName>FreeRTOS.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\FreeRTOS.h</FilePath>
-            </File>
-            <File>
-              <FileName>list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\list.h</FilePath>
-            </File>
-            <File>
-              <FileName>message_buffer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\message_buffer.h</FilePath>
-            </File>
-            <File>
-              <FileName>mpu_prototypes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\mpu_prototypes.h</FilePath>
-            </File>
-            <File>
-              <FileName>mpu_syscall_numbers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\mpu_syscall_numbers.h</FilePath>
-            </File>
-            <File>
-              <FileName>mpu_wrappers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\mpu_wrappers.h</FilePath>
-            </File>
-            <File>
-              <FileName>newlib-freertos.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\newlib-freertos.h</FilePath>
-            </File>
-            <File>
-              <FileName>picolibc-freertos.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\picolibc-freertos.h</FilePath>
-            </File>
-            <File>
-              <FileName>portable.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\portable.h</FilePath>
-            </File>
-            <File>
-              <FileName>projdefs.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\projdefs.h</FilePath>
-            </File>
-            <File>
-              <FileName>queue.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\queue.h</FilePath>
-            </File>
-            <File>
-              <FileName>semphr.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\semphr.h</FilePath>
-            </File>
-            <File>
-              <FileName>stack_macros.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\stack_macros.h</FilePath>
-            </File>
-            <File>
-              <FileName>StackMacros.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\StackMacros.h</FilePath>
-            </File>
-            <File>
-              <FileName>stream_buffer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\stream_buffer.h</FilePath>
-            </File>
-            <File>
-              <FileName>task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\task.h</FilePath>
-            </File>
-            <File>
-              <FileName>timers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\timers.h</FilePath>
-            </File>
             <File>
               <FileName>atomic.h</FileName>
               <FileType>5</FileType>
@@ -897,6 +797,21 @@
               <FileName>timers.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\FreeRTOS-Kernel\timers.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SH367303</GroupName>
+          <Files>
+            <File>
+              <FileName>SH367303.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\SH367303\SH367303.c</FilePath>
+            </File>
+            <File>
+              <FileName>SH367303.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\SH367303\SH367303.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1586,116 +1501,16 @@
               <FileType>5</FileType>
               <FilePath>.\source\eez\src\ui\vars.h</FilePath>
             </File>
+            <File>
+              <FileName>ui_font_7px__.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\eez\src\ui\ui_font_7px__.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>RTOS/include</GroupName>
           <Files>
-            <File>
-              <FileName>atomic.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\atomic.h</FilePath>
-            </File>
-            <File>
-              <FileName>croutine.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\croutine.h</FilePath>
-            </File>
-            <File>
-              <FileName>deprecated_definitions.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\deprecated_definitions.h</FilePath>
-            </File>
-            <File>
-              <FileName>event_groups.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\event_groups.h</FilePath>
-            </File>
-            <File>
-              <FileName>FreeRTOS.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\FreeRTOS.h</FilePath>
-            </File>
-            <File>
-              <FileName>list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\list.h</FilePath>
-            </File>
-            <File>
-              <FileName>message_buffer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\message_buffer.h</FilePath>
-            </File>
-            <File>
-              <FileName>mpu_prototypes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\mpu_prototypes.h</FilePath>
-            </File>
-            <File>
-              <FileName>mpu_syscall_numbers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\mpu_syscall_numbers.h</FilePath>
-            </File>
-            <File>
-              <FileName>mpu_wrappers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\mpu_wrappers.h</FilePath>
-            </File>
-            <File>
-              <FileName>newlib-freertos.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\newlib-freertos.h</FilePath>
-            </File>
-            <File>
-              <FileName>picolibc-freertos.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\picolibc-freertos.h</FilePath>
-            </File>
-            <File>
-              <FileName>portable.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\portable.h</FilePath>
-            </File>
-            <File>
-              <FileName>projdefs.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\projdefs.h</FilePath>
-            </File>
-            <File>
-              <FileName>queue.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\queue.h</FilePath>
-            </File>
-            <File>
-              <FileName>semphr.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\semphr.h</FilePath>
-            </File>
-            <File>
-              <FileName>stack_macros.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\stack_macros.h</FilePath>
-            </File>
-            <File>
-              <FileName>StackMacros.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\StackMacros.h</FilePath>
-            </File>
-            <File>
-              <FileName>stream_buffer.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\stream_buffer.h</FilePath>
-            </File>
-            <File>
-              <FileName>task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\task.h</FilePath>
-            </File>
-            <File>
-              <FileName>timers.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\source\FreeRTOS-Kernel\include\timers.h</FilePath>
-            </File>
             <File>
               <FileName>atomic.h</FileName>
               <FileType>5</FileType>
@@ -1870,6 +1685,21 @@
               <FileName>timers.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\FreeRTOS-Kernel\timers.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SH367303</GroupName>
+          <Files>
+            <File>
+              <FileName>SH367303.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\SH367303\SH367303.c</FilePath>
+            </File>
+            <File>
+              <FileName>SH367303.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\source\SH367303\SH367303.h</FilePath>
             </File>
           </Files>
         </Group>
