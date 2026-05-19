@@ -74,7 +74,7 @@ extern "C"
 #define LL_GPIO_ENABLE                              (DDL_ON)
 #define LL_HASH_ENABLE                              (DDL_OFF)
 #define LL_HRPWM_ENABLE                             (DDL_OFF)
-#define LL_I2C_ENABLE                               (DDL_OFF)
+#define LL_I2C_ENABLE                               (DDL_ON)
 #define LL_I2S_ENABLE                               (DDL_OFF)
 #define LL_INTERRUPTS_ENABLE                        (DDL_ON)
 #define LL_INTERRUPTS_SHARE_ENABLE                  (DDL_ON)

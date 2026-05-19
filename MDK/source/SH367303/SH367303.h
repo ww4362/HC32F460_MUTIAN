@@ -440,8 +440,8 @@ int8_t SH36730X_DSG(uint8_t enable);
 int8_t SH36730X_Read_CBStatus(uint8_t channel);
 
 
-
-
+void sh_I2C_Write(uint8_t RegAddress, uint8_t ByteData);
+uint16_t sh_I2C_Read(uint8_t RegAddress);
 
 
 #ifdef __cplusplus

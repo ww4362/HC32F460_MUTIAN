@@ -139,6 +139,50 @@ void LCD_Address_Set(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2)
 
 void LCD_Init(void)
 {
+	/*LCD_PWM*/
+	
+	stc_tmra_init_t stcTmraInit;
+    stc_tmra_pwm_init_t stcPwmInit;
+
+      GPIO_SetFunc(GPIO_PORT_B,GPIO_PIN_14,GPIO_FUNC_4);//TIMA-3-PWM1/TIMA-3-CLKA
+
+    /* Enable TMRA_3 peripheral clock */
+    FCG_Fcg2PeriphClockCmd(FCG2_PERIPH_TMRA_1, ENABLE);
+
+    /************************* Configure TMRA_3 counter *************************/
+    (void)TMRA_StructInit(&stcTmraInit);  
+    /* Config software count */
+    stcTmraInit.sw_count.u8ClockDiv = TMRA_CLK_DIV8;  //时钟为100M 那pwm频率为50k 
+    stcTmraInit.sw_count.u8CountMode = TMRA_MD_SAWTOOTH;
+    stcTmraInit.sw_count.u8CountDir = TMRA_DIR_UP;
+    stcTmraInit.u32PeriodValue = 255-1U;
+    (void)TMRA_Init(CM_TMRA_1, &stcTmraInit);
+
+    /************************* Configure TMRA_3_1 CMP ***************************/
+    /* Config PWM output */
+    (void)TMRA_PWM_StructInit(&stcPwmInit);
+    stcPwmInit.u32CompareValue = 1-1;  //比较值
+    stcPwmInit.u16StartPolarity = TMRA_PWM_HOLD;  //开始值   分频后只能设置保存不变
+    stcPwmInit.u16StopPolarity = TMRA_PWM_HOLD;  //停止值   分频后只能设置保存不变
+    stcPwmInit.u16CompareMatchPolarity = TMRA_PWM_HIGH;  //比较      
+    stcPwmInit.u16PeriodMatchPolarity = TMRA_PWM_LOW ;   //周期     
+		//TMRA_PWM_SetForcePolarity(CM_TMRA_3, TMRA_CH1,TMRA_PWM_FORCE_LOW); //设置默认输出为低电平
+    (void)TMRA_PWM_Init(CM_TMRA_1, TMRA_CH6, &stcPwmInit);
+    /* PWM pin function set */
+    TMRA_SetFunc(CM_TMRA_1, TMRA_CH6, TMRA_FUNC_CMP);
+    /* PWM output command */
+    TMRA_PWM_OutputCmd(CM_TMRA_1, TMRA_CH6, ENABLE);
+		
+
+
+
+
+
+    /* Start timerA */
+    TMRA_Start(CM_TMRA_1);
+		
+		CM_TMRA_1->CMPAR6=100;
+	
 	    /* GPIO initialize */
     stc_gpio_init_t stcGpioInit;
     /* PB3 set to GPIO-Output */

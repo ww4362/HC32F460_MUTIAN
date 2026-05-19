@@ -503,6 +503,11 @@
               <FileType>1</FileType>
               <FilePath>.\driver\src\hc32_ll_tmr6.c</FilePath>
             </File>
+            <File>
+              <FileName>hc32_ll_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driver\src\hc32_ll_i2c.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1390,6 +1395,11 @@
               <FileName>hc32_ll_tmr6.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\driver\src\hc32_ll_tmr6.c</FilePath>
+            </File>
+            <File>
+              <FileName>hc32_ll_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\driver\src\hc32_ll_i2c.c</FilePath>
             </File>
           </Files>
         </Group>

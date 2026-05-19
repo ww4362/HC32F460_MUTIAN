@@ -91,7 +91,9 @@ int32_t BSP_PRINTF_Preinit(void *vpDevice, uint32_t u32Baudrate);
 
 static void App_ClkCfg(void)
 {
-	  /* Set bus clock div. */
+
+		/*下面是外部晶振*/
+    /* Set bus clock div. */
     CLK_SetClockDiv(CLK_BUS_CLK_ALL, (CLK_HCLK_DIV1 | CLK_EXCLK_DIV2 | CLK_PCLK0_DIV1 | CLK_PCLK1_DIV2 | \
                                    CLK_PCLK2_DIV4 | CLK_PCLK3_DIV4 | CLK_PCLK4_DIV2));
     /* sram init include read/write wait cycle setting */
@@ -99,17 +101,25 @@ static void App_ClkCfg(void)
     SRAM_SetWaitCycle(SRAM_SRAMH, SRAM_WAIT_CYCLE0, SRAM_WAIT_CYCLE0);
     /* flash read wait cycle setting */
     EFM_SetWaitCycle(EFM_WAIT_CYCLE5);
+    /* XTAL config */
+    stc_clock_xtal_init_t stcXtalInit;
+    (void)CLK_XtalStructInit(&stcXtalInit);
+    stcXtalInit.u8State = CLK_XTAL_ON;
+    stcXtalInit.u8Drv = CLK_XTAL_DRV_HIGH;
+    stcXtalInit.u8Mode = CLK_XTAL_MD_OSC;
+    stcXtalInit.u8StableTime = CLK_XTAL_STB_2MS;
+    (void)CLK_XtalInit(&stcXtalInit);
     /* MPLL config */
     stc_clock_pll_init_t stcMPLLInit;
     (void)CLK_PLLStructInit(&stcMPLLInit);
     stcMPLLInit.PLLCFGR = 0UL;
     stcMPLLInit.PLLCFGR_f.PLLM = (1UL - 1UL);
-    stcMPLLInit.PLLCFGR_f.PLLN = (25UL - 1UL);
+    stcMPLLInit.PLLCFGR_f.PLLN = (50UL - 1UL);
     stcMPLLInit.PLLCFGR_f.PLLP = (2UL - 1UL);
     stcMPLLInit.PLLCFGR_f.PLLQ = (2UL - 1UL);
     stcMPLLInit.PLLCFGR_f.PLLR = (2UL - 1UL);
     stcMPLLInit.u8PLLState = CLK_PLL_ON;
-    stcMPLLInit.PLLCFGR_f.PLLSRC = CLK_PLL_SRC_HRC;
+    stcMPLLInit.PLLCFGR_f.PLLSRC = CLK_PLL_SRC_XTAL;
     (void)CLK_PLLInit(&stcMPLLInit);
     /* 3 cycles for 126MHz ~ 200MHz */
     GPIO_SetReadWaitCycle(GPIO_RD_WAIT3);
@@ -117,43 +127,18 @@ static void App_ClkCfg(void)
     PWC_HighSpeedToHighPerformance();
     /* Set the system clock source */
     CLK_SetSysClockSrc(CLK_SYSCLK_SRC_PLL);
-		
-		
-		/*下面是外部晶振*/
-//    /* Set bus clock div. */
-//    CLK_SetClockDiv(CLK_BUS_CLK_ALL, (CLK_HCLK_DIV1 | CLK_EXCLK_DIV2 | CLK_PCLK0_DIV1 | CLK_PCLK1_DIV2 | \
-//                                   CLK_PCLK2_DIV4 | CLK_PCLK3_DIV4 | CLK_PCLK4_DIV2));
-//    /* sram init include read/write wait cycle setting */
-//    SRAM_SetWaitCycle(SRAM_SRAM_ALL, SRAM_WAIT_CYCLE1, SRAM_WAIT_CYCLE1);
-//    SRAM_SetWaitCycle(SRAM_SRAMH, SRAM_WAIT_CYCLE0, SRAM_WAIT_CYCLE0);
-//    /* flash read wait cycle setting */
-//    EFM_SetWaitCycle(EFM_WAIT_CYCLE5);
-//    /* XTAL config */
-//    stc_clock_xtal_init_t stcXtalInit;
-//    (void)CLK_XtalStructInit(&stcXtalInit);
-//    stcXtalInit.u8State = CLK_XTAL_ON;
-//    stcXtalInit.u8Drv = CLK_XTAL_DRV_HIGH;
-//    stcXtalInit.u8Mode = CLK_XTAL_MD_OSC;
-//    stcXtalInit.u8StableTime = CLK_XTAL_STB_2MS;
-//    (void)CLK_XtalInit(&stcXtalInit);
-//    /* MPLL config */
-//    stc_clock_pll_init_t stcMPLLInit;
-//    (void)CLK_PLLStructInit(&stcMPLLInit);
-//    stcMPLLInit.PLLCFGR = 0UL;
-//    stcMPLLInit.PLLCFGR_f.PLLM = (1UL - 1UL);
-//    stcMPLLInit.PLLCFGR_f.PLLN = (50UL - 1UL);
-//    stcMPLLInit.PLLCFGR_f.PLLP = (2UL - 1UL);
-//    stcMPLLInit.PLLCFGR_f.PLLQ = (2UL - 1UL);
-//    stcMPLLInit.PLLCFGR_f.PLLR = (2UL - 1UL);
-//    stcMPLLInit.u8PLLState = CLK_PLL_ON;
-//    stcMPLLInit.PLLCFGR_f.PLLSRC = CLK_PLL_SRC_XTAL;
-//    (void)CLK_PLLInit(&stcMPLLInit);
-//    /* 3 cycles for 126MHz ~ 200MHz */
-//    GPIO_SetReadWaitCycle(GPIO_RD_WAIT3);
-//    /* Switch driver ability */
-//    PWC_HighSpeedToHighPerformance();
-//    /* Set the system clock source */
-//    CLK_SetSysClockSrc(CLK_SYSCLK_SRC_PLL);
+}
+
+uint8_t i;
+void INT_SRC_GPIO_PA08_IrqCallback(void)
+{
+	DDL_DelayMS (20);
+sh_I2C_Read(0x01);
+	SH36730X_Read_BATT_Voltage(0);
+	SH36730X_Read_BATT_Voltage(1);
+	SH36730X_Read_BATT_Voltage(2);
+	SH36730X_Read_BATT_Voltage(3);
+	SH36730X_Read_BATT_Voltage(4);
 }
 
 //Port Config
@@ -181,8 +166,35 @@ static void App_PortCfg(void)
     (void)GPIO_Init(GPIO_PORT_B, GPIO_PIN_11, &stcGpioInit);
 		
 
+		    /* GPIO initialize */
+    /* PA8 set to GPIO-Input */
+    (void)GPIO_StructInit(&stcGpioInit);
+    stcGpioInit.u16PullUp = PIN_PU_ON;
+    stcGpioInit.u16ExtInt = PIN_EXTINT_ON;
+    stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_08, &stcGpioInit);
+
+		stc_extint_init_t stcExtIntInit;
+    stc_irq_signin_config_t stcIrqSignConfig;		
 		
+    /* ExtInt config */
+    (void)EXTINT_StructInit(&stcExtIntInit);
+    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
+    (void)EXTINT_Init(EXTINT_CH08, &stcExtIntInit);
+
+    /* IRQ sign-in */
+    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ8 ;
+    stcIrqSignConfig.enIRQn      = INT008_IRQn;
+    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA08_IrqCallback;
+    (void)INTC_IrqSignIn(&stcIrqSignConfig);
+
+    /* Disable all */
+    INTC_IntCmd(INTC_INT8, ENABLE);   //启用中断 
+    /* NVIC config */
+    NVIC_ClearPendingIRQ(INT008_IRQn);  //清除下事件 
 		
+    NVIC_SetPriority(INT008_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
+		NVIC_EnableIRQ(INT008_IRQn); // 
 
 		
 		GPIO_SetFunc(GPIO_PORT_B,GPIO_PIN_07,GPIO_FUNC_32);//USART3-TX
@@ -208,8 +220,8 @@ int32_t main(void)
     App_PortCfg();
 	
 	PrintfInit();
-I2C_init();
 
+SH36730X_Init();
 
     /* Register write protected for some required peripherals. */
 //    LL_PERIPH_WP(LL_PERIPH_ALL);
@@ -280,9 +292,11 @@ loadScreen(SCREEN_ID_MAIN );
 //lv_indev_set_group(indev, groups.zu1);
 
 //lv_group_set_editing(group, true);
-	I2C_WriteRegByte(SH_ADDR_WRITE,SH_SCONF3,0b00010100);
+//	I2C_WriteRegByte(SH_ADDR_WRITE,SH_SCONF3,0b00010100);
+	
 
 
+//	RTOS_START();
     for (;;) {
 
 			
