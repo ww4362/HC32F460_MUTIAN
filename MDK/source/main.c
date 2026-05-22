@@ -133,12 +133,7 @@ uint8_t i;
 void INT_SRC_GPIO_PA08_IrqCallback(void)
 {
 	DDL_DelayMS (20);
-sh_I2C_Read(0x01);
-	SH36730X_Read_BATT_Voltage(0);
-	SH36730X_Read_BATT_Voltage(1);
-	SH36730X_Read_BATT_Voltage(2);
-	SH36730X_Read_BATT_Voltage(3);
-	SH36730X_Read_BATT_Voltage(4);
+
 }
 
 //Port Config
@@ -236,9 +231,9 @@ SH36730X_Init();
 //DDL_DelayMS(1000);
 
 //	
-lv_init();
+//lv_init();
 
-lv_port_disp_init();
+//lv_port_disp_init();
 
 
 
@@ -263,11 +258,11 @@ lv_port_disp_init();
 
 
 //			
-ui_init(); 	
+//ui_init(); 	
 
 
 
-loadScreen(SCREEN_ID_MAIN );
+//loadScreen(SCREEN_ID_MAIN );
 
 //lv_group_add_obj(group, objects.bar);
 //lv_group_add_obj(group, objects.bar2);

@@ -315,7 +315,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>0</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>__DEBUG,HC32F460,USE_DDL_DRIVER,</Define>
               <Undefine></Undefine>
-              <IncludePath>.\common;.\source;.\driver\inc;..\Hardware;..\middlewares\lvgl;..\middlewares\lvgl\src;..\middlewares\lvgl\examples\porting;..\middlewares\lvgl\examples\;..\middlewares;..\middlewares\lvgl\demos;..\middlewares\lvgl\demos\widgets;..\eez\src\ui;..\eezfolw\src\ui;.\source\eez\src\ui;.\source\FreeRTOS-Kernel\include;.\source\FreeRTOS-Kernel\portable;.\source\FreeRTOS-Kernel;.\source\SH367303</IncludePath>
+              <IncludePath>.\common;.\source;.\driver\inc;..\Hardware;..\middlewares\lvgl;..\middlewares\lvgl\src;..\middlewares\lvgl\examples\porting;..\middlewares\lvgl\examples\;..\middlewares;..\middlewares\lvgl\demos;..\middlewares\lvgl\demos\widgets;..\eez\src\ui;..\eezfolw\src\ui;.\source\eez\src\ui;.\source\FreeRTOS-Kernel\include;.\source\FreeRTOS-Kernel\portable;.\source\FreeRTOS-Kernel;.\source\SH367303;..\Hardware\sh_367303</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -384,6 +384,13 @@
       <Groups>
         <Group>
           <GroupName>common</GroupName>
+          <Files>
+            <File>
+              <FileName>说明.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\说明.txt</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>source</GroupName>
@@ -542,6 +549,16 @@
               <FileName>pic.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Hardware\pic.h</FilePath>
+            </File>
+            <File>
+              <FileName>IIC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\IIC.c</FilePath>
+            </File>
+            <File>
+              <FileName>IIC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\IIC.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -809,14 +826,49 @@
           <GroupName>SH367303</GroupName>
           <Files>
             <File>
+              <FileName>BMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS.c</FilePath>
+            </File>
+            <File>
+              <FileName>BMS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS.h</FilePath>
+            </File>
+            <File>
+              <FileName>BMS_UART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS_UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>BMS_UART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS_UART.h</FilePath>
+            </File>
+            <File>
+              <FileName>CRC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\CRC.c</FilePath>
+            </File>
+            <File>
+              <FileName>CRC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\CRC.h</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\README.md</FilePath>
+            </File>
+            <File>
               <FileName>SH367303.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\source\SH367303\SH367303.c</FilePath>
+              <FilePath>..\Hardware\sh_367303\SH367303.c</FilePath>
             </File>
             <File>
               <FileName>SH367303.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\source\SH367303\SH367303.h</FilePath>
+              <FilePath>..\Hardware\sh_367303\SH367303.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1277,6 +1329,13 @@
       <Groups>
         <Group>
           <GroupName>common</GroupName>
+          <Files>
+            <File>
+              <FileName>说明.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\说明.txt</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>source</GroupName>
@@ -1435,6 +1494,16 @@
               <FileName>pic.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Hardware\pic.h</FilePath>
+            </File>
+            <File>
+              <FileName>IIC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\IIC.c</FilePath>
+            </File>
+            <File>
+              <FileName>IIC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\IIC.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1702,14 +1771,49 @@
           <GroupName>SH367303</GroupName>
           <Files>
             <File>
+              <FileName>BMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS.c</FilePath>
+            </File>
+            <File>
+              <FileName>BMS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS.h</FilePath>
+            </File>
+            <File>
+              <FileName>BMS_UART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS_UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>BMS_UART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS_UART.h</FilePath>
+            </File>
+            <File>
+              <FileName>CRC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\CRC.c</FilePath>
+            </File>
+            <File>
+              <FileName>CRC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\CRC.h</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\README.md</FilePath>
+            </File>
+            <File>
               <FileName>SH367303.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\source\SH367303\SH367303.c</FilePath>
+              <FilePath>..\Hardware\sh_367303\SH367303.c</FilePath>
             </File>
             <File>
               <FileName>SH367303.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\source\SH367303\SH367303.h</FilePath>
+              <FilePath>..\Hardware\sh_367303\SH367303.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1727,110 +1831,10 @@
   </Targets>
 
   <RTE>
-    <packages>
-      <filter>
-        <targetInfos/>
-      </filter>
-      <package name="CMSIS" vendor="ARM">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="CMSIS-Compiler" vendor="ARM">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="CMSIS-DSP" vendor="ARM" version="1.16.2">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug" versionMatchMode="fixed"/>
-        </targetInfos>
-      </package>
-      <package name="CMSIS-Driver" vendor="ARM">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="CMSIS-NN" vendor="ARM">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="CMSIS-RTX" vendor="ARM">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="CMSIS-View" vendor="ARM">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="Cortex_DFP" vendor="ARM">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="HC32F460" vendor="HDSC" version="1.0.12">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug" versionMatchMode="fixed"/>
-        </targetInfos>
-      </package>
-      <package name="MDK-Middleware" vendor="Keil">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="STM32F1xx_DFP" vendor="Keil">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="STM32F4xx_DFP" vendor="Keil">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="STM32F7xx_DFP" vendor="Keil">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="STM32H7xx_DFP" vendor="Keil">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="lvgl" vendor="LVGL" version="9.2.2">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug" versionMatchMode="fixed"/>
-        </targetInfos>
-      </package>
-      <package name="MM32F3270_DFP" vendor="MindMotion" version="1.0.5">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug" versionMatchMode="fixed"/>
-        </targetInfos>
-      </package>
-      <package name="PY32F0xx_DFP" vendor="Puya">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="PY32F4xx_DFP" vendor="Puya">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-      <package name="PY32L0xx_DFP" vendor="Puya">
-        <targetInfos>
-          <targetInfo name="LCDDEMO_Debug"/>
-        </targetInfos>
-      </package>
-    </packages>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.1.1" condition="ARMv6_7_8-M Device" ymlID="CMSIS:CORE">
-        <package name="CMSIS" schemaVersion="1.7.40" url="https://www.keil.com/pack/" vendor="ARM" version="6.2.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.2.0" condition="ARMv6_7_8-M Device" ymlID="CMSIS:CORE">
+        <package name="CMSIS" schemaVersion="1.7.53" url="https://www.keil.com/pack/" vendor="ARM" version="6.3.0"/>
         <targetInfos>
           <targetInfo name="LCDDEMO_Debug"/>
           <targetInfo name="LCDDEMO_Release"/>

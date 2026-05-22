@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE kbits PUBLIC "-//Kreative//DTD BitsNPicasBitmap 1.0//EN" "http://www.kreativekorp.com/dtd/kbitx.dtd">
+<kbits>
+<prop id="emAscent" value="9"/>
+<prop id="emDescent" value="1"/>
+<prop id="lineAscent" value="7"/>
+<prop id="lineDescent" value="1"/>
+<prop id="lineGap" value="0"/>
+<prop id="xHeight" value="5"/>
+<prop id="capHeight" value="7"/>
+<prop id="newGlyphWidth" value="8"/>
+<name id="1" value="Untitled"/>
+<name id="2" value="Regular"/>
+<name id="3" value="BitsNPicas: Untitled: 2026"/>
+<name id="4" value="Untitled"/>
+<name id="5" value="Version 1.0"/>
+<name id="6" value="Untitled"/>
+<name id="8" value="Made with Bits&#39;n&#39;Picas by Kreative Software"/>
+<name id="11" value="http://www.kreativekorp.com/software/bitsnpicas/"/>
+<g u="5" x="0" y="0" w="8" d="AAA"/>
+<g u="32" x="0" y="9" w="8" d="CQVGA0IDQgNCA0IDQgNCA0Y"/>
+<g u="33" x="0" y="9" w="8" d="CQMCwv8ARQJBAkECQQJBAkECQQ"/>
+<g u="34" x="0" y="9" w="8" d="CQVFBEEEQQRHBEEEQQRF"/>
+<g u="35" x="0" y="9" w="8" d="CQVFBEEEQQTC/wBEBEEEQQRG"/>
+<g u="36" x="0" y="9" w="8" d="CQVBA0IDQgNCA0YEQQRBBEEEQQ"/>
+<g u="37" x="0" y="9" w="8" d="CQVGBEEEQQRFBEEEQQRG"/>
+<g u="38" x="0" y="9" w="8" d="CQVGBEEEQQRGA0IDQgNG"/>
+<g u="39" x="0" y="9" w="8" d="CQVGA0IDQQRBBEEEQQRBBEEEQQ"/>
+<g u="40" x="0" y="9" w="8" d="CQVGA0IDQgNHA0IDQgNG"/>
+<g u="41" x="0" y="9" w="8" d="CQVGA0IDQgNGBEEEQQRG"/>
+<g u="42" x="0" y="0" w="8" d="AAA"/>
+<g u="95" x="0" y="0" w="8" d="AAA"/>
+<g u="111" x="0" y="0" w="8" d="AAA"/>
+<g u="127" x="0" y="0" w="8" d="AAA"/>
+<g u="170" x="0" y="0" w="8" d="AAA"/>
+<g u="173" x="0" y="0" w="8" d="AAA"/>
+<g u="175" x="0" y="0" w="8" d="AAA"/>
+<g u="176" x="2" y="9" w="8" d="AwNEAUQ"/>
+<g u="196" x="0" y="0" w="8" d="AAA"/>
+<g u="247" x="0" y="0" w="8" d="AAA"/>
+<g u="12288" x="0" y="0" w="8" d="AAA"/>
+</kbits>
