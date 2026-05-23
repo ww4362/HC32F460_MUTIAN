@@ -22,8 +22,8 @@
                           }while(0)       /* SCL */
 
 #define IIC_SDA(x)        do{ x ? \
-                            	GPIO_SetPins(GPIO_PORT_A, GPIO_PIN_03) : \
-                              GPIO_ResetPins(GPIO_PORT_A, GPIO_PIN_03); \
+                            	GPIO_SetPins(GPIO_PORT_A, GPIO_PIN_00) : \
+                              GPIO_ResetPins(GPIO_PORT_A, GPIO_PIN_00); \
                           }while(0)       /* SDA */
 
 #define IIC_READ_SDA     GPIO_ReadInputPins(GPIO_PORT_A, GPIO_PIN_00) /* 读取SDA */

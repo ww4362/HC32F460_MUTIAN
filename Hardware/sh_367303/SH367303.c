@@ -23,14 +23,16 @@ int8_t SH36730X_Init(void)
     stcGpioInit.u16PinDir = PIN_DIR_OUT;
     stcGpioInit.u16PinOutputType = PIN_OUT_TYPE_NMOS;
     stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+		stcGpioInit.u16PinState = PIN_STAT_SET ;
 		stcGpioInit.u16PinDrv= PIN_HIGH_DRV;
-    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_03, &stcGpioInit);
+    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_00, &stcGpioInit);
 
     /* PA1 set to GPIO-Output SCL */
     (void)GPIO_StructInit(&stcGpioInit);
     stcGpioInit.u16PinDir = PIN_DIR_OUT;
     stcGpioInit.u16PinOutputType = PIN_OUT_TYPE_NMOS;
     stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+		stcGpioInit.u16PinState = PIN_STAT_SET ;
 		stcGpioInit.u16PinDrv= PIN_HIGH_DRV;
     (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_01, &stcGpioInit);
 
@@ -42,19 +44,6 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
 //	HAL_GPIO_WritePin(SH_CHGD_GPIO_Port,SH_CHGD_Pin,GPIO_PIN_RESET);  
 //	HAL_GPIO_WritePin(SH_DSGD_GPIO_Port,SH_DSGDP_Pin,GPIO_PIN_SET);
 
-	iic_start();
-//iic_send_byte(0xAA);
-
-        IIC_SDA(1);    /* 高位先发送 */
-        delay_us(1);
-        IIC_SCL(1);
-        delay_us(1);
-        IIC_SCL(0);
-        delay_us(1);
-        IIC_SCL(1);
-        delay_us(1);
-        IIC_SCL(0);
-DDL_DelayMS(1000);
 
     //配置 SH36730X 硬件参数选项
     //SCONF1
