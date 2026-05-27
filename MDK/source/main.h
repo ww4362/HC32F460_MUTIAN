@@ -15,6 +15,7 @@
 #include "RTOS_mian.h"
 #include "queue.h"
 #include "semphr.h"
+#include "multi_button.h" 
 
 
 
@@ -34,7 +35,7 @@ uint8_t flash_num; //flash写入次数
 	
 } config_t;
 extern config_t  config;
-
+ extern uint8_t scree_id;
 
 extern uint8_t Edit_Mode_Controls;
 //进入编辑模式的控件

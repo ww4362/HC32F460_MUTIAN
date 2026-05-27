@@ -4,7 +4,7 @@
  */
 
 /*Copy this file as "lv_port_indev.c" and set this value to "1" to enable content*/
-#if 1
+#if 0
 
 /*********************
  *      INCLUDES
@@ -131,13 +131,13 @@ void lv_port_indev_init(void)
      * -----------------*/
 
     /*Initialize your encoder if you have*/
-    encoder_init();
+//    encoder_init();
 
     /*Register a encoder input device*/
 		
-    indev_encoder = lv_indev_create();  //创建indev 
-    lv_indev_set_type(indev_encoder, LV_INDEV_TYPE_ENCODER);   //设置为旋转编码器
-    lv_indev_set_read_cb(indev_encoder, encoder_read);   //设置旋转编码器的状态回调函数
+//    indev_encoder = lv_indev_create();  //创建indev 
+//    lv_indev_set_type(indev_encoder, LV_INDEV_TYPE_ENCODER);   //设置为旋转编码器
+//    lv_indev_set_read_cb(indev_encoder, encoder_read);   //设置旋转编码器的状态回调函数
     /*Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
      *add objects to the group with `lv_group_add_obj(group, obj)`
      *and assign this input device to group to navigate in it:
@@ -156,19 +156,19 @@ void lv_port_indev_init(void)
 //     * -----------------*/
 
 //    /*Initialize your button if you have*/
-//    button_init();
+    button_init();
 
-//    /*Register a button input device*/
-//    indev_button = lv_indev_create();
-//    lv_indev_set_type(indev_button, LV_INDEV_TYPE_BUTTON);
-//    lv_indev_set_read_cb(indev_button, button_read);
+    /*Register a button input device*/
+    indev_button = lv_indev_create();
+    lv_indev_set_type(indev_button, LV_INDEV_TYPE_BUTTON);
+    lv_indev_set_read_cb(indev_button, button_read);
 
-//    /*Assign buttons to points on the screen*/
-//    static const lv_point_t btn_points[2] = {
-//        {10, 10},   /*Button 0 -> x:10; y:10*/
+    /*Assign buttons to points on the screen*/
+    static const lv_point_t btn_points[1] = {
+        {10, 10},   /*Button 0 -> x:10; y:10*/
 //        {40, 100},  /*Button 1 -> x:40; y:100*/
-//    };
-//    lv_indev_set_button_points(indev_button, btn_points);
+    };
+    lv_indev_set_button_points(indev_button, btn_points);
 }
 
 /**********************
@@ -617,10 +617,17 @@ static void encoder_handler(void)
  * -----------------*/
 
 /*Initialize your buttons*/
-static void button_init(void)
-{
-    /*Your code comes here*/
-}
+//static void button_init(void)
+//{
+//    /*Your code comes here*/
+//	  /* PA8 set to GPIO-Input */
+//	    stc_gpio_init_t stcGpioInit;
+//    (void)GPIO_StructInit(&stcGpioInit);
+//    stcGpioInit.u16PullUp = PIN_PU_ON;
+//    stcGpioInit.u16ExtInt = PIN_EXTINT_ON;
+//    stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+//    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_08, &stcGpioInit);
+//}
 
 /*Will be called by the library to read the button*/
 static void button_read(lv_indev_t * indev_drv, lv_indev_data_t * data)

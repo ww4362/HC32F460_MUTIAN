@@ -26,6 +26,11 @@ extern void I2C_WriteRegByte_CRC8(uint8_t SlaveAddress, uint8_t RegAddress, uint
 extern uint16_t I2C_ReadReg2Byte_CRC8(uint8_t SlaveAddress, uint8_t RegAddress); //通过I2C从设备寄存器读两个字节
 extern uint8_t I2C_ReadRegByte_CRC8(uint8_t SlaveAddress, uint8_t RegAddress); //通过I2C从设备寄存器读一个字节
 
+	
+	
+	
+	
+	
 
 #define ON 1
 #define OFF 0

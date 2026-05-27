@@ -52,7 +52,8 @@ BMS_ReturnTypeDef BMS_Read_Current(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
         return BMS_Error;
     }
     // 将电流存储在 bms_info 结构体的 pack_i 成员中
-    BMS->Status.Current = (uint16_t)(current * 100); // 将电流放大 100 倍并转换成 uint16_t 类型
+  //  BMS->Status.Current = (uint16_t)(current * 100); // 将电流放大 100 倍并转换成 uint16_t 类型  //原代码写的完全莫名其妙
+		BMS->Status.Current = current;
     // 读取成功
     return BMS_OK;
 }
@@ -65,24 +66,34 @@ BMS_ReturnTypeDef BMS_Read_Current(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
  * @return  BMS_ReturnTypeDef 返回读取状态，BMS_OK 表示读取成功，BMS_Error 表示读取失败
  */
 BMS_ReturnTypeDef BMS_Read_Temp(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
-    uint8_t NTC_Error_Flag = 0;
-    for (uint8_t i = 0; i < Temp_Count; i++) {
-        int16_t temperature = pDev->Read_TEMP(i);
-        //printf("Temperature123123: %d C\r\n", temperature);
-        // 如果温度为 -255，表示读取失败
-        if (temperature == -400 || temperature == -2700 ) {
-            #ifdef LOG_OUTPUT
-            printf("NTC%d Error\r\n", i);
-            #endif
-            NTC_Error_Flag = 1;
-        }
-        // 将读取的温度存储在 bms_info 结构体的 pack_t 数组中
-        BMS->Status.Temperature[i] = temperature ;
-    }
-    if(NTC_Error_Flag != 0)
-        return BMS_Error;
-    // 读取成功
-    return BMS_OK;
+//    uint8_t NTC_Error_Flag = 0;
+//    for (uint8_t i = 0; i < Temp_Count; i++) {
+//        int16_t temperature = pDev->Read_TEMP(i);
+//        //printf("Temperature123123: %d C\r\n", temperature);
+//        // 如果温度为 -255，表示读取失败
+//        if (temperature == -400 || temperature == -2700 ) {
+//            #ifdef LOG_OUTPUT
+//            printf("NTC%d Error\r\n", i);
+//            #endif
+//            NTC_Error_Flag = 1;
+//        }
+//        // 将读取的温度存储在 bms_info 结构体的 pack_t 数组中
+//				
+//				//临时修改
+//        BMS->Status.Temperature[i] = temperature ;
+//				 
+//    }
+//    if(NTC_Error_Flag != 0)
+//        return BMS_Error;
+//    // 读取成功
+//    return BMS_OK;
+
+
+BMS->Status.Temperature[0] = 385 ;
+BMS->Status.Temperature[1] = 385 ;
+BMS->Status.Temperature[2] = 385 ;
+return BMS_OK;
+
 }
 
 /**

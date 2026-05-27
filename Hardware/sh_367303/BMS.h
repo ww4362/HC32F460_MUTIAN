@@ -24,6 +24,8 @@
 //#define USING_SH367309
 #define USING_UART
 
+#define DSC_V_MAX   0x255  //充电保护电压 寄存器值 x5.86 
+
 #define ON 1
 #define OFF 0
 #define true 1
@@ -33,9 +35,9 @@
 #define BAT_OverChargeAlarm           4500  // 过充报警电压 4.5V
 #define BAT_OverChargeRecovery        4100  // 过充恢复电压 4.1V
 
-#define BAT_OverDischargeWarn         3300  // 过放预警电压 3.3V
-#define BAT_OverDischargeAlarm        3000  // 过放报警电压 3.0V
-#define BAT_OverDischargeRecovery     3400  // 过放恢复电压 3.4V
+#define BAT_OverDischargeWarn         2700  // 过放预警电压 3.3V
+#define BAT_OverDischargeAlarm        2500  // 过放报警电压 3.0V
+#define BAT_OverDischargeRecovery     3000  // 过放恢复电压 3.4V
 
 #define BAT_OverChargeCurrentWarn     500  // 充电过流电流 5A
 #define BAT_OverChargeCurrentAlarm    300  // 充电过流预警电流 3A
@@ -149,7 +151,8 @@ enum T_AlarmType{
 typedef struct {
     uint16_t BAT_Voltage[Battery_Count];//单电池电压 3300 = 3.300V
     uint16_t Pack_Voltage;         //单电池电压 58000 = 58.000V
-    int16_t Current;               //电池组电流  100 = 1.00A +为充电 -为放电
+	//uint16_t Current;               //电池组电流  100 = 1.00A +为充电 -为放电 原来的莫名其妙 注释掉
+	float Current ;						//单位 毫安
     int16_t Temperature[Temp_Count]; //温度 3850 = 38.5°C
     uint8_t SwitchStatus[6];          // 开关状态（负载检测、充电检测、MOS 状态等）1开启 0关闭
     uint8_t CBxStatus[CELL_BALANCE_Count];//均衡通道状态 1开启 0关闭

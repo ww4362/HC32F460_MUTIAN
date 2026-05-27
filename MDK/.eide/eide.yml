@@ -9,7 +9,8 @@ virtualFolder:
   files: []
   folders:
     - name: common
-      files: []
+      files:
+        - path: 说明.txt
       folders: []
     - name: source
       files:
@@ -48,6 +49,14 @@ virtualFolder:
         - path: ../Hardware/lcd_init.h
         - path: ../Hardware/lcdfont.h
         - path: ../Hardware/pic.h
+        - path: ../Hardware/sh_367303/IIC.c
+        - path: ../Hardware/sh_367303/IIC.h
+        - path: ../Hardware/multi_button.c
+        - path: ../Hardware/multi_button.h
+        - path: ../Hardware/sw6306/sw6306.c
+        - path: ../Hardware/sw6306/sw6306.h
+        - path: ../Hardware/sw6306/sw6306_IIC.c
+        - path: ../Hardware/sw6306/sw6306_IIC.h
       folders: []
     - name: txt
       files:
@@ -67,7 +76,12 @@ virtualFolder:
         - path: source/eez/src/ui/ui.c
         - path: source/eez/src/ui/ui.h
         - path: source/eez/src/ui/vars.h
-        - path: source/eez/src/ui/ui_font_7px__.c
+        - path: source/eez/src/ui/ui_font_5x9.c
+        - path: source/eez/src/ui/ui_font_rajdhani_bold.c
+        - path: source/eez/src/ui/ui_font_rajdhani_bold_14.c
+        - path: source/eez/src/ui/ui_font_rajdhani_medium_20.c
+        - path: source/eez/src/ui/ui_font_7px_1.c
+        - path: source/eez/src/ui/ui_font_16px.c
       folders: []
     - name: RTOS
       files:
@@ -171,6 +185,7 @@ targets:
         - source/FreeRTOS-Kernel
         - source/SH367303
         - ../Hardware/sh_367303
+        - ../Hardware/sw6306
         - .cmsis/include
         - RTE/Device/HC32F460JEUA
         - RTE/LVGL
@@ -197,7 +212,7 @@ targets:
             language-cpp: c++11
             link-time-optimization: false
             one-elf-section-per-function: true
-            optimization: level-1
+            optimization: level-0
             short-enums#wchar: true
             warnings: ac5-like-warnings
           global:

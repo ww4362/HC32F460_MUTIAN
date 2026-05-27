@@ -1,7 +1,7 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[mutian.eez-project]:/userPages/0",
-    "selectedFontObject": "[mutian.eez-project]:/fonts/5",
+    "selectedUserPageObject": "[mutian.eez-project]:/userPages/1",
+    "selectedFontObject": "[mutian.eez-project]:/fonts/0",
     "subnavigationSelectedItems": {}
   },
   "layoutModel": {
@@ -22,7 +22,7 @@
           },
           {
             "type": "border",
-            "selected": 1,
+            "selected": 4,
             "size": 240,
             "location": "right",
             "children": [
@@ -70,6 +70,7 @@
           },
           {
             "type": "border",
+            "selected": 0,
             "location": "bottom",
             "children": [
               {
@@ -193,17 +194,27 @@
               "children": [
                 {
                   "type": "tab",
-                  "id": "#50cf3ba8-f716-4e41-8525-a86e6594edb4",
-                  "name": "Main",
+                  "id": "#a189e278-8f2e-4c5e-8a3c-e3bbd05e4ae2",
+                  "name": "Power bank",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[mutian.eez-project]:/userPages/0",
+                    "objectPath": "[mutian.eez-project]:/userPages/1",
                     "permanent": false
                   },
                   "icon": "svg:page"
+                },
+                {
+                  "type": "tab",
+                  "id": "#50cf3ba8-f716-4e41-8525-a86e6594edb4",
+                  "name": "system",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[mutian.eez-project]:/userPages/1",
+                    "permanent": true
+                  },
+                  "icon": "svg:page"
                 }
-              ],
-              "active": true
+              ]
             },
             {
               "type": "row",
@@ -223,7 +234,8 @@
                       "enableClose": false,
                       "icon": "svg:properties"
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1020,7 +1032,8 @@
                       "component": "groups",
                       "enableClose": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1057,10 +1070,57 @@
       },
       "transform": {
         "translate": {
-          "x": -80,
-          "y": -140
+          "x": -227.33334350585938,
+          "y": -170.66668701171875
         },
-        "scale": 1
+        "scale": 4
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[mutian.eez-project]:/userPages/1[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {
+          "1": {
+            "$selected": true
+          },
+          "7": {}
+        }
+      },
+      "transform": {
+        "translate": {
+          "x": -294.66668701171875,
+          "y": -126
+        },
+        "scale": 4
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[mutian.eez-project]:/userPages/2[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {
+          "10": {
+            "$selected": true
+          }
+        }
+      },
+      "transform": {
+        "translate": {
+          "x": -294.66668701171875,
+          "y": 174
+        },
+        "scale": 4
       },
       "timeline": {
         "isEditorActive": false,
@@ -1092,7 +1152,7 @@
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
-  "flowZoom": 1,
+  "flowZoom": 4,
   "implementationLanguage": "C",
   "openDialogDefaultPath": "C:\\Users\\ww436\\Documents\\GitHub\\HC32F460_MUTIAN\\MDK\\source\\eez\\resource\\Rajdhani-Medium.ttf"
 }

@@ -24,11 +24,12 @@
 #include "main.h"
 
 #include "lv_port_disp_template.h"
-//#include "lv_port_indev_template.h"
+#include "lv_port_indev_template.h"
 #include "lcd_init.h" 
 #include "lcd.h" 
 #include "SH367303.h"
-
+#include "sw6306.h" 
+#include "sw6306_IIC.h"  
 /*******************************************************************************
  * Local type definitions ('typedef')
  ******************************************************************************/
@@ -130,9 +131,9 @@ static void App_ClkCfg(void)
 }
 
 uint8_t i;
+lv_obj_t * act_scr;
 void INT_SRC_GPIO_PA08_IrqCallback(void)
 {
-	DDL_DelayMS (20);
 
 }
 
@@ -165,36 +166,79 @@ static void App_PortCfg(void)
     /* PA8 set to GPIO-Input */
     (void)GPIO_StructInit(&stcGpioInit);
     stcGpioInit.u16PullUp = PIN_PU_ON;
-    stcGpioInit.u16ExtInt = PIN_EXTINT_ON;
     stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
     (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_08, &stcGpioInit);
 
-		stc_extint_init_t stcExtIntInit;
-    stc_irq_signin_config_t stcIrqSignConfig;		
-		
-    /* ExtInt config */
-    (void)EXTINT_StructInit(&stcExtIntInit);
-    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
-    (void)EXTINT_Init(EXTINT_CH08, &stcExtIntInit);
+//		stc_extint_init_t stcExtIntInit;
+//    stc_irq_signin_config_t stcIrqSignConfig;		
+//		
+//    /* ExtInt config */
+//    (void)EXTINT_StructInit(&stcExtIntInit);
+//    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
+//    (void)EXTINT_Init(EXTINT_CH08, &stcExtIntInit);
 
-    /* IRQ sign-in */
-    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ8 ;
-    stcIrqSignConfig.enIRQn      = INT008_IRQn;
-    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA08_IrqCallback;
-    (void)INTC_IrqSignIn(&stcIrqSignConfig);
+//    /* IRQ sign-in */
+//    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ8 ;
+//    stcIrqSignConfig.enIRQn      = INT008_IRQn;
+//    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA08_IrqCallback;
+//    (void)INTC_IrqSignIn(&stcIrqSignConfig);
 
-    /* Disable all */
-    INTC_IntCmd(INTC_INT8, ENABLE);   //启用中断 
-    /* NVIC config */
-    NVIC_ClearPendingIRQ(INT008_IRQn);  //清除下事件 
-		
-    NVIC_SetPriority(INT008_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
-		NVIC_EnableIRQ(INT008_IRQn); // 
+//    /* Disable all */
+//    INTC_IntCmd(INTC_INT8, ENABLE);   //启用中断 
+//    /* NVIC config */
+//    NVIC_ClearPendingIRQ(INT008_IRQn);  //清除下事件 
+//		
+//    NVIC_SetPriority(INT008_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
+//		NVIC_EnableIRQ(INT008_IRQn); // 
 
 		
 		GPIO_SetFunc(GPIO_PORT_B,GPIO_PIN_07,GPIO_FUNC_32);//USART3-TX
     
 }
+
+static uint8_t read_button_gpio(uint8_t button_id)
+{
+    switch (button_id) {
+
+				case 1:
+						return GPIO_ReadInputPins(GPIO_PORT_A, GPIO_PIN_08);
+				break;
+        default:
+        return 0;
+    }
+}
+ uint8_t scree_id=0;
+void BTN1_SINGLE_CLICK_Callback(Button *btn)
+{
+			
+		switch(scree_id++)
+		{
+			case 0:
+				loadScreen(SCREEN_ID_POWER_BANK );
+			break;
+			case 1:
+				loadScreen(SCREEN_ID_SYSTEM );
+			break;
+			case 2:
+			loadScreen(SCREEN_ID_MAIN );
+			scree_id=0;
+			break;
+			
+		}
+	
+}
+static Button btn1;
+void  Button_init(void)
+{
+	
+	button_init(&btn1, read_button_gpio, 0, 1);
+
+
+
+button_attach(&btn1,BTN_SINGLE_CLICK,BTN1_SINGLE_CLICK_Callback);
+	button_start(&btn1);
+}
+
 
 
 
@@ -216,8 +260,8 @@ int32_t main(void)
 	
 	PrintfInit();
 
-SH36730X_Init();
 
+	
     /* Register write protected for some required peripherals. */
 //    LL_PERIPH_WP(LL_PERIPH_ALL);
 	LCD_Init ();
@@ -226,14 +270,13 @@ SH36730X_Init();
 //LCD_ShowChar(56,16,'A',GRAYBLUE,BLACK ,16,0);
 //LCD_ShowChar(136,0,'W',BRED,BLACK ,16,0);
 //	
-	
-
+	 Button_init();
 //DDL_DelayMS(1000);
 
 //	
-//lv_init();
+lv_init();
 
-//lv_port_disp_init();
+lv_port_disp_init();
 
 
 
@@ -258,11 +301,11 @@ SH36730X_Init();
 
 
 //			
-//ui_init(); 	
+ui_init(); 	
 
 
 
-//loadScreen(SCREEN_ID_MAIN );
+loadScreen(SCREEN_ID_MAIN );
 
 //lv_group_add_obj(group, objects.bar);
 //lv_group_add_obj(group, objects.bar2);
@@ -291,7 +334,7 @@ SH36730X_Init();
 	
 
 
-//	RTOS_START();
+	RTOS_START();
     for (;;) {
 
 			

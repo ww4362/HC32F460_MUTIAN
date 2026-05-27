@@ -1,0 +1,22 @@
+{
+  "files": [
+    "actions.h",
+    "fonts.h",
+    "images.c",
+    "images.h",
+    "screens.c",
+    "screens.h",
+    "structs.h",
+    "styles.c",
+    "styles.h",
+    "ui.c",
+    "ui.h",
+    "ui_font_16px.c",
+    "ui_font_5x9.c",
+    "ui_font_7px_1.c",
+    "ui_font_rajdhani_bold.c",
+    "ui_font_rajdhani_bold_14.c",
+    "ui_font_rajdhani_medium_20.c",
+    "vars.h"
+  ]
+}

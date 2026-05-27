@@ -6,13 +6,19 @@
     * 功     能：SH36730X 驱动代码
 *********************************************************************************/
 #include "SH367303.h"
-
+uint16_t sh367303_INT_CNT;
+void INT_SRC_GPIO_PA03_IrqCallback(void)
+{
+	sh367303_INT_CNT++;
+	
+}
 /**
  * @brief   初始化 SH36730X
  *
  * @return  0   初始化成功
  *          -1   初始化失败
  */
+ SH367303_SCONF_TypeDef SH367303_SCONF_Struct = {0};
 int8_t SH36730X_Init(void)
 {
     /* GPIO initialize */
@@ -35,8 +41,38 @@ int8_t SH36730X_Init(void)
 		stcGpioInit.u16PinState = PIN_STAT_SET ;
 		stcGpioInit.u16PinDrv= PIN_HIGH_DRV;
     (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_01, &stcGpioInit);
+	
+	//pa3 报警中断
+			    /* GPIO initialize */
+    /* PA8 set to GPIO-Input */
+    (void)GPIO_StructInit(&stcGpioInit);
+    stcGpioInit.u16ExtInt = PIN_EXTINT_ON;
+    stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_03, &stcGpioInit);
 
-SH367303_SCONF_TypeDef SH367303_SCONF_Struct = {0};
+		stc_extint_init_t stcExtIntInit;
+    stc_irq_signin_config_t stcIrqSignConfig;		
+		
+    /* ExtInt config */
+    (void)EXTINT_StructInit(&stcExtIntInit);
+    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
+    (void)EXTINT_Init(EXTINT_CH03, &stcExtIntInit);
+
+    /* IRQ sign-in */
+    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ3 ;
+    stcIrqSignConfig.enIRQn      = INT003_IRQn;
+    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA03_IrqCallback;
+    (void)INTC_IrqSignIn(&stcIrqSignConfig);
+
+    /* Disable all */
+    INTC_IntCmd(INTC_INT3, ENABLE);   //启用中断 
+    /* NVIC config */
+    NVIC_ClearPendingIRQ(INT003_IRQn);  //清除下事件 
+		
+    NVIC_SetPriority(INT003_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
+		NVIC_EnableIRQ(INT003_IRQn); // 
+
+
 SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     /****启动 SH36730X...****/
     //->设置 CHGD 为低  SH退出低功耗状态 输出V33
@@ -58,11 +94,11 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     //SCONF2
     SH367303_SCONF_Struct.RESET_PF = SH_RESET_PF_EN;
     SH367303_SCONF_Struct.ALARM_C = SH_ALARM_EN;
-    SH367303_SCONF_Struct.DSG_C = SH_DSG_DIS;
-    SH367303_SCONF_Struct.CHG_C = SH_CHG_DIS;
+    SH367303_SCONF_Struct.DSG_C = SH_DSG_EN;
+    SH367303_SCONF_Struct.CHG_C = SH_CHG_EN;
     //SCONF3
     SH367303_SCONF_Struct.CADC_EN = SH_CADC_EN;
-    SH367303_SCONF_Struct.CADC_M = SH_CADC_M_SINGLE;
+    SH367303_SCONF_Struct.CADC_M = SH_CADC_M_CONTINUOUS;
     SH367303_SCONF_Struct.CBIT_C = SH_CBIT_13;
     SH367303_SCONF_Struct.VADC_EN = SH_VADC_EN;
     SH367303_SCONF_Struct.VADC_C = SH_VADC_C_VT;
@@ -80,7 +116,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     SH367303_SCONF_Struct.CB2 = SH_CB2_DIS;
     SH367303_SCONF_Struct.CB1 = SH_CB1_DIS;
     //SCONF6
-    SH367303_SCONF_Struct.RSNS = SH_RSNS_50mV;
+    SH367303_SCONF_Struct.RSNS = SH_RSNS_200mV;
     SH367303_SCONF_Struct.RST = SH_RST_32mS;
     SH367303_SCONF_Struct.SCV = SH_SCV_400mV;
     SH367303_SCONF_Struct.SCT = SH_SCT_50uS;
@@ -89,7 +125,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     SH367303_SCONF_Struct.CHS = SH_CHS_12mV;
     SH367303_SCONF_Struct.WDTT = SH_WDTT_30S;
     //SCONF8-9
-    SH367303_SCONF_Struct.OVD = 0x02CC;  //  716/5.86 = 4,195V  充电保护电压
+    SH367303_SCONF_Struct.OVD = DSC_V_MAX;  //  充电保护电压
 
     if(SH36730X_HardwareInit(&SH367303_SCONF_Struct) != 0)
     {
@@ -333,11 +369,11 @@ int8_t SH36730X_ReadInterrupStatus(SH367303_FLAG_TypeDef *SH367303_FLAG_Struct)
  * @brief   读取电流值
  *
  * @return  float   电流值（单位：安培）
- */
+ */uint16_t data;
 float SH36730X_Read_Current(void)
 {
     //SH367303_SCONF_TypeDef *SH367303_SCONF_Struct;
-	  uint16_t data;
+	  
     uint8_t polar;
     float Current;
 	//SH367303_SCONF_Struct->RSNS = SH_RSNS_50mV; //读取全局结构体 待修改
@@ -345,7 +381,7 @@ float SH36730X_Read_Current(void)
 
     if (data & 0x1000)  //判断极性  12byte 1  ===  polar0 = 放电
     {
-        data = data | 0xe000;
+        data = data & 0x0FFF;
         polar = 0;
     }
     else
@@ -370,9 +406,11 @@ float SH36730X_Read_Current(void)
 //            }
 //        case SH_RSNS_50mV :
 //            {
-                Current = (1.0f * (float)data) / (65536.0f * (float)SH367303_Rsens);
+                Current = (1000.0f * (float)data) / (16384.0f * (float)SH367303_Rsens);
                 //Current = Current * 1000.0f; //转换为mA
 //            }
+		
+		
 //            break;
 //        default:
 //            break;
@@ -381,10 +419,10 @@ float SH36730X_Read_Current(void)
     switch (polar)  //计算极性
     {
         case 0:
-            Current = -Current;
+            Current = Current;
             break;
         case 1:
-            Current = Current;
+            Current = -Current;
             break;
         default:
             break;
