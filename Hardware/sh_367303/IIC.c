@@ -210,6 +210,7 @@ void iic_send_byte(uint8_t data)
         IIC_SCL(1);
         iic_delay(IIC_Delay);
         IIC_SCL(0);
+				iic_delay(IIC_Delay);
         data <<= 1;     /* 左移1位,用于下一次发送 */
     }
     IIC_SDA(1);         /* 发送完成, 主机释放SDA线 */
@@ -285,10 +286,10 @@ uint8_t CRC8(uint8_t *data , uint8_t len)
 }
 
 
-
+uint8_t CRC_buf[6];
 uint16_t I2C_ReadReg2Byte_CRC8(uint8_t SlaveAddress, uint8_t RegAddress) //通过I2C从设备寄存器读两个字节(CRC校验)
 {
-    uint8_t CRC_buf[6];
+    
     uint16_t data;
     CRC_buf[0] = (SlaveAddress<<1);
     CRC_buf[1] = RegAddress;
@@ -324,7 +325,7 @@ return data;
 
 uint8_t I2C_ReadRegByte_CRC8(uint8_t SlaveAddress, uint8_t RegAddress) //通过I2C从设备寄存器读一个字节
 {
-    uint8_t CRC_buf[6];
+    
     uint8_t data;
     CRC_buf[0] = (SlaveAddress<<1);
     CRC_buf[1] = RegAddress;

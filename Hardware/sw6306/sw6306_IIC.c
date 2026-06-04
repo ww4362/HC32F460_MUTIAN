@@ -220,6 +220,7 @@ void sw6306_iic_send_byte(uint8_t data)
         sw6306_iic_SCL(1);
         sw6306_iic_delay(sw6306_iic_Delay);
         sw6306_iic_SCL(0);
+				sw6306_iic_delay(sw6306_iic_Delay);
         data <<= 1;     /* 左移1位,用于下一次发送 */
     }
     sw6306_iic_SDA(1);         /* 发送完成, 主机释放SDA线 */

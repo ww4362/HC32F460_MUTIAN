@@ -87,7 +87,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     SH367303_SCONF_Struct.CTLD_EN = SH_CTLD_EN;
     SH367303_SCONF_Struct.PD_EN = SH_PD_DIS;
     SH367303_SCONF_Struct.WDT_EN = SH_WDT_DIS;
-    SH367303_SCONF_Struct.SC_EN = SH_SC_EN ;
+    SH367303_SCONF_Struct.SC_EN = SH_SC_DIS ;
     SH367303_SCONF_Struct.OV_EN = SH_OV_EN;
     SH367303_SCONF_Struct.LOAD_EN = SH_LOAD_EN;
     SH367303_SCONF_Struct.CHGR_EN = SH_CHGR_EN;
@@ -101,7 +101,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     SH367303_SCONF_Struct.CADC_M = SH_CADC_M_CONTINUOUS;
     SH367303_SCONF_Struct.CBIT_C = SH_CBIT_13;
     SH367303_SCONF_Struct.VADC_EN = SH_VADC_EN;
-    SH367303_SCONF_Struct.VADC_C = SH_VADC_C_VT;
+    SH367303_SCONF_Struct.VADC_C = SH_VADC_C_V;
     SH367303_SCONF_Struct.SCAN_C = SH_SCAN_C_200mS;
     //SCONF4
     SH367303_SCONF_Struct.CB10 = SH_CB10_DIS;
@@ -118,10 +118,10 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     //SCONF6
     SH367303_SCONF_Struct.RSNS = SH_RSNS_200mV;
     SH367303_SCONF_Struct.RST = SH_RST_32mS;
-    SH367303_SCONF_Struct.SCV = SH_SCV_400mV;
+    SH367303_SCONF_Struct.SCV = SH_SCV_200mV;
     SH367303_SCONF_Struct.SCT = SH_SCT_50uS;
     //SCONF7
-    SH367303_SCONF_Struct.OVT = SH_OVT_32;
+    SH367303_SCONF_Struct.OVT = SH_OVT_2;
     SH367303_SCONF_Struct.CHS = SH_CHS_12mV;
     SH367303_SCONF_Struct.WDTT = SH_WDTT_30S;
     //SCONF8-9
@@ -139,7 +139,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     SH367303_INT_EN_Struct.SC_INT = SH_SC_INT_DIS;
     SH367303_INT_EN_Struct.OV_INT = SH_OV_INT_DIS;
     SH367303_INT_EN_Struct.CD_INT = SH_CD_INT_DIS;
-    SH367303_INT_EN_Struct.CADC_INT = SH_CADC_INT_DIS;
+    SH367303_INT_EN_Struct.CADC_INT = SH_CADC_INT_EN;
     SH367303_INT_EN_Struct.VADC_INT = SH_VADC_INT_DIS;
     SH367303_INT_EN_Struct.WDT_INT = SH_WDT_INT_DIS;
     SH367303_INT_EN_Struct.TWI_INT = SH_TWI_INT_DIS;
@@ -369,11 +369,11 @@ int8_t SH36730X_ReadInterrupStatus(SH367303_FLAG_TypeDef *SH367303_FLAG_Struct)
  * @brief   读取电流值
  *
  * @return  float   电流值（单位：安培）
- */uint16_t data;
+ */
 float SH36730X_Read_Current(void)
 {
     //SH367303_SCONF_TypeDef *SH367303_SCONF_Struct;
-	  
+	  int16_t data;
     uint8_t polar;
     float Current;
 	//SH367303_SCONF_Struct->RSNS = SH_RSNS_50mV; //读取全局结构体 待修改
@@ -381,14 +381,9 @@ float SH36730X_Read_Current(void)
 
     if (data & 0x1000)  //判断极性  12byte 1  ===  polar0 = 放电
     {
-        data = data & 0x0FFF;
-        polar = 0;
-    }
-    else
-    {
-        data = data;
-        polar = 1;
-    }
+       data = data | 0xe000;
+
+		}
     
 //    switch (SH367303_SCONF_Struct->RSNS)    //计算电流 单A
 //    {
@@ -406,27 +401,41 @@ float SH36730X_Read_Current(void)
 //            }
 //        case SH_RSNS_50mV :
 //            {
-                Current = (1000.0f * (float)data) / (16384.0f * (float)SH367303_Rsens);
-                //Current = Current * 1000.0f; //转换为mA
+		
+//							if(data!=0xFFF)
+//							{
+//								if( polar ==1)
+//								{
+//                Current = (1000.0f * (float)data) / (8192.0f*2 * (float)SH367303_Rsens);
+//                //Current = Current * 1000.0f; //转换为mA
+//								}else{
+//									Current = (1000.0f * (float)(0xFFF-data)) / (8192.0f*2 * (float)SH367303_Rsens);
+//								}
+//							}else{
+//								Current =0.0f;
+//							}
 //            }
 		
+		
+		                Current = (1.0f * (float)data) / (8192.0f*2  * (float)SH367303_Rsens);
+                Current = -(Current * 1000.0f); //转换为mA
 		
 //            break;
 //        default:
 //            break;
 //    }
     
-    switch (polar)  //计算极性
-    {
-        case 0:
-            Current = Current;
-            break;
-        case 1:
-            Current = -Current;
-            break;
-        default:
-            break;
-    }
+//    switch (polar)  //计算极性
+//    {
+//        case 0:
+//            Current = Current;
+//            break;
+//        case 1:
+//            Current = -Current;
+//            break;
+//        default:
+//            break;
+//    }
 	return Current;
 }
 
@@ -712,7 +721,7 @@ int8_t SH36730X_Write_CB(uint8_t channel, uint8_t enable) {
  * @return  0   初始化成功
  *          -1   初始化失败
  */
-int8_t SH36730X_Read_CBStatus(uint8_t channel) {
+uint16_t SH36730X_Read_CBStatus(void) {
     // 读取寄存器状态字节
     uint16_t sconf_data = I2C_ReadReg2Byte_CRC8(SH_ADDR, SH_SCONF4);
 
@@ -720,7 +729,7 @@ int8_t SH36730X_Read_CBStatus(uint8_t channel) {
     if (sconf_data == 0xFFFF) {
         return -1; // 读取失败
     }
-
-    return ((sconf_data >> (4 - channel)) & 0x01) ? true : false; // 读取均衡通道状态
+return sconf_data;
+//    return ((sconf_data >> (4 - channel)) & 0x01) ? true : false; // 读取均衡通道状态
 }
 

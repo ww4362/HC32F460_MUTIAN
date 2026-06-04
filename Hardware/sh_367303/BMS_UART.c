@@ -108,7 +108,7 @@ int8_t BMS_UART_Write_CB(uint8_t channel, uint8_t enable)
  *
  * @return  电池状态
  */
-int8_t BMS_UART_Read_CBStatus(uint8_t channel)
+uint16_t BMS_UART_Read_CBStatus(void)
 {
     int8_t status = 0;
     return status;

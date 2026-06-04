@@ -31,19 +31,19 @@
 #define true 1
 #define false 0
 
-#define BAT_OverChargeWarn            4200  // 过充预警电压 4.2V
-#define BAT_OverChargeAlarm           4500  // 过充报警电压 4.5V
-#define BAT_OverChargeRecovery        4100  // 过充恢复电压 4.1V
+#define BAT_OverChargeWarn            3600  // 过充预警电压 4.2V
+#define BAT_OverChargeAlarm           3600  // 过充报警电压 4.5V
+#define BAT_OverChargeRecovery        3500  // 过充恢复电压 4.1V
 
 #define BAT_OverDischargeWarn         2700  // 过放预警电压 3.3V
-#define BAT_OverDischargeAlarm        2500  // 过放报警电压 3.0V
+#define BAT_OverDischargeAlarm        3200  // 过放报警电压 3.0V
 #define BAT_OverDischargeRecovery     3000  // 过放恢复电压 3.4V
 
 #define BAT_OverChargeCurrentWarn     500  // 充电过流电流 5A
 #define BAT_OverChargeCurrentAlarm    300  // 充电过流预警电流 3A
 
-#define BAT_OverDischargeCurrentWarn  500  // 放电过流电流 5A
-#define BAT_OverDischargeCurrentAlarm 300  // 放电过流预警电流 3A
+#define BAT_OverDischargeCurrentWarn  30000  // 放电过流电流 30A
+#define BAT_OverDischargeCurrentAlarm 30000  // 放电过流预警电流 3A
 
 #define BAT_HighChargeTemperatureWarn     600   // 过温预警温度 60℃
 #define BAT_HighChargeTemperatureAlarm    600   // 过温预警温度 60℃
@@ -99,7 +99,7 @@ struct AFE_Device {
     int8_t (*DSG)(uint8_t enable);                                     // 放电控制
     int8_t (*Write_CB)(uint8_t channel, uint8_t enable);                   // 均衡控制
     int8_t (*Write_CTLD)(uint8_t enable);                              // PWM控制
-    int8_t (*Read_CBStatus)(uint8_t channel);                                  // 均衡状态读取
+    uint16_t (*Read_CBStatus)(void);                                  // 均衡状态读取
     int8_t (*Read_BSTATUS)(void);   // 读取开关状态
     uint16_t (*Read_BATT_Voltage)(uint8_t Channel);               // 电池电压读取
     float (*Read_Current)(void);                        // 电池电流读取
@@ -155,7 +155,7 @@ typedef struct {
 	float Current ;						//单位 毫安
     int16_t Temperature[Temp_Count]; //温度 3850 = 38.5°C
     uint8_t SwitchStatus[6];          // 开关状态（负载检测、充电检测、MOS 状态等）1开启 0关闭
-    uint8_t CBxStatus[CELL_BALANCE_Count];//均衡通道状态 1开启 0关闭
+	uint8_t CBxStatus[Battery_Count];//均衡通道状态 1开启 0关闭   均衡通道状态当然是电池数量 不知道作者写减一是啥意思
 } BMS_StatusTypeDef; //存储电池初始采集状态
 
 typedef struct {

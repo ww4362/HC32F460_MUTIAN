@@ -590,6 +590,16 @@
               <FileType>5</FileType>
               <FilePath>..\Hardware\sw6306\sw6306_IIC.h</FilePath>
             </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\flash.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1589,6 +1599,16 @@
               <FileName>sw6306_IIC.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Hardware\sw6306\sw6306_IIC.h</FilePath>
+            </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\sh_367303\flash.h</FilePath>
             </File>
           </Files>
         </Group>

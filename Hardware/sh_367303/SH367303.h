@@ -421,7 +421,7 @@ int16_t lookup_temperature(float resistance) ;
 int8_t SH36730X_Write_CB(uint8_t channel, uint8_t enable);
 int8_t SH36730X_CHG(uint8_t enable);
 int8_t SH36730X_DSG(uint8_t enable);
-int8_t SH36730X_Read_CBStatus(uint8_t channel);
+uint16_t SH36730X_Read_CBStatus(void);
 
 
 

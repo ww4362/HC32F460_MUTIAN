@@ -22,7 +22,7 @@ int8_t BMS_UART_Read_BSTATUS(void);
 int8_t BMS_UART_CHG(uint8_t enable);
 int8_t BMS_UART_DSG(uint8_t enable);
 int8_t BMS_UART_Write_CB(uint8_t channel, uint8_t enable);
-int8_t BMS_UART_Read_CBStatus(uint8_t channel);
+uint16_t BMS_UART_Read_CBStatus(void);
 int8_t BMS_UART_Write_CTLD(uint8_t enable);
 
 

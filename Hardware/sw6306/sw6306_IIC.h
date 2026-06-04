@@ -15,7 +15,7 @@
 
 #define sw6306_iic_READ_SDA     GPIO_ReadInputPins(GPIO_PORT_B, GPIO_PIN_08) /* ∂¡»°SDA */
 													
-#define sw6306_iic_Delay     1
+#define sw6306_iic_Delay     2
 
 
 													

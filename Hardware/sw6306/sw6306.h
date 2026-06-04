@@ -48,6 +48,10 @@ extern C {
 #define SW6306_NTC_B                    3435
 #endif
 
+#define SW6306_BAT_FCV                17500      //单位  毫伏  
+
+
+
 //输入输出最大功率设定，最大100W
 #define SW6306_INPUT_POWER_MAX          65U         //输入/充电功率，单位1W
 #define SW6306_OUTPUT_POWER_MAX         100U         //输出/放电功率，单位1W

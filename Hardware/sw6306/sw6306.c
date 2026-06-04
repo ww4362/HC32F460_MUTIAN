@@ -24,7 +24,7 @@ SW6306_RET SW6306_I2C_Receive(uint8_t addr, uint16_t reg,uint8_t *pdata,uint8_t 
     }
     pdata[i] = sw6306_iic_read_byte(0);
     sw6306_iic_stop();
-		*pflag=0;
+		*pflag=1;
 }
 
 /*******************************基本操作区*************************************/
@@ -118,7 +118,7 @@ SW6306_RET SW6306_ADCRead(SW6306_ARGS(uint8_t ch, uint16_t *pData))
     SW6306_FUNC_BEGIN;
     SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_ADC_SET, ch);
     SW6306_EXEC(SW6306_I2C_Receive(SW6306_I2C_ADDR, SW6306_STRG_ADCL, (uint8_t*)pData, 2, (uint8_t*)&SW6306_Status.flag));
-   // SW6306_UNTIL(SW6306_Status.flag)
+    //SW6306_UNTIL(SW6306_Status.flag)
     SW6306_FUNC_END;
 }
 
@@ -760,7 +760,7 @@ SW6306_RET SW6306_Init(SW6306_NOARG)
     //解锁寄存器写入
     SW6306_SPAWN_NOARG(SW6306_Unlock);
 	    //强制控制输入输出功率和电池电流
-    SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_FORCECTL, SW6306_FORCECTL_POUT|SW6306_FORCECTL_PIN|SW6306_FORCECTL_IBAT);
+    SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_FORCECTL, SW6306_FORCECTL_POUT|SW6306_FORCECTL_PIN|SW6306_FORCECTL_IBAT|SW6306_FORCECTL_VBAT);
 //    //设置放电电池端限流值
     SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_DCHG_IBAT, (SW6306_BAT_DCHG_CURR_MAX/100)&0xFFU);
     //输入功率设置
@@ -769,6 +769,13 @@ SW6306_RET SW6306_Init(SW6306_NOARG)
     SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_CHG_IBAT, (SW6306_BAT_CHG_CURR_MAX/100)&0xFFU);
     //输出功率设置
     SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_POSET, SW6306_OUTPUT_POWER_MAX);
+
+	//浮充电压设置
+		SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_CHG_VBATL, (uint8_t)(SW6306_BAT_FCV/10));
+		SW6306_SPAWN_ARGS(SW6306_ByteWrite, SW6306_CTRG_CHG_VBATH, (uint8_t)(((SW6306_BAT_FCV / 10) >> 8) & 0x0F));
+		
+	
+	//
 	
 	
 	    //切换寄存器组

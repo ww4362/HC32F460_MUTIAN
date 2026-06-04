@@ -271,7 +271,7 @@ int32_t main(void)
 //LCD_ShowChar(136,0,'W',BRED,BLACK ,16,0);
 //	
 	 Button_init();
-//DDL_DelayMS(1000);
+
 
 //	
 lv_init();

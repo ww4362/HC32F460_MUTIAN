@@ -28,7 +28,7 @@
 
 #define IIC_READ_SDA     GPIO_ReadInputPins(GPIO_PORT_A, GPIO_PIN_00) /* 读取SDA */
 													
-#define IIC_Delay     1
+#define IIC_Delay     2
 
 
 													

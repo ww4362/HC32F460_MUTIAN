@@ -126,10 +126,28 @@ BMS_ReturnTypeDef BMS_Read_SwitchStatus(struct AFE_Device *pDev ,BMSTypeDef *BMS
 
 BMS_ReturnTypeDef BMS_Read_CBStatus(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
     // 调用读取均衡通道状态的函数
+	uint16_t buf=0;
+		buf=SH36730X_Read_CBStatus();
+	for(int i=0;i<Battery_Count-1;i++)
+	{
+		BMS->Status.CBxStatus[i]=(buf>i)&0x01;
+		
+		
+	}
+//    if (SH36730X_Read_CBStatus(buf) != 0) {
+//        return BMS_Error; // 如果读取失败，直接返回错误状态
+//   }
+	
+	
     // if (SH36730X_Read_CBStatus(BMS->Status.CBxStatus) != 0) {
     //     return BMS_Error; // 如果读取失败，直接返回错误状态
     // }
     //待完善
+	
+	//要读取均衡状态  给屏幕显示用
+	
+	
+	
     return BMS_OK; // 读取成功
 }
 
@@ -154,17 +172,17 @@ BMS_ReturnTypeDef BMS_Read_Status(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
         return BMS_Error; // 如果读取电流失败，直接返回错误状态
     }
 
-    // 读取温度并传入数组中
-    if (BMS_Read_Temp(pDev , BMS) != BMS_OK) {
-        return BMS_Error; // 如果读取温度失败，直接返回错误状态
-    }
+//    // 读取温度并传入数组中
+//    if (BMS_Read_Temp(pDev , BMS) != BMS_OK) {
+//        return BMS_Error; // 如果读取温度失败，直接返回错误状态
+//    }
 
     // 读取开关量状态并传入数组中
     if (BMS_Read_SwitchStatus(pDev , BMS) != BMS_OK) {
         return BMS_Error; // 如果读取温度失败，直接返回错误状态
     }
 
-    // 读取开关量状态并传入数组中
+    // 读取均衡开关量状态并传入数组中
     if (BMS_Read_CBStatus(pDev , BMS) != BMS_OK) {
         return BMS_Error; // 如果读取温度失败，直接返回错误状态
     }
