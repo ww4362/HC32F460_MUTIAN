@@ -202,6 +202,8 @@ if(!BMS .Status.SwitchStatus[CHG])
 {
 	if(adc_flag&0x400)
 	{
+		
+		Batty_t.Energy_max=Batty_t.Remaining_Energy;
 		//说明出现了过充 
 		if(ret==BMS_OK)
 		{
@@ -240,6 +242,9 @@ if(BMS.Status .Current>13)
 		{
 			//说明出现了过放
 			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
+			//过放如果还有能量的话 最大能量减去当前能量
+			Batty_t.Energy_max-=Batty_t.Remaining_Energy;
+			Batty_t.Remaining_Energy=0;
 			OD_Time = xTaskGetTickCount();
 			 goto EXIT;
 		}
@@ -338,15 +343,15 @@ void LVGL_Tick(TimerHandle_t xTimer)
 void Coulometer(void)
 {
 	static uint8_t tpm_SOC=0; //记录上一时刻电量
-	//过充警告 出来表示充电到了100% 强制把剩余电量拉到100%
-		if(!BMS .Status.SwitchStatus[CHG])
-	{
-		if(I2C_ReadReg2Byte_CRC8(SH_ADDR , SH_FLAG1 )&0x400)
-		{
-		Batty_t.SOC=100;
-		Batty_t.Energy_max=	Batty_t.Remaining_Energy;
-		}
-	}	
+//	//过充警告 出来表示充电到了100% 强制把剩余电量拉到100%
+//		if(!BMS .Status.SwitchStatus[CHG])
+//	{
+//		if(I2C_ReadReg2Byte_CRC8(SH_ADDR , SH_FLAG1 )&0x400)
+//		{
+//		Batty_t.SOC=100;
+//		Batty_t.Energy_max=	Batty_t.Remaining_Energy;
+//		}
+//	}	
 	
 	if(fabsf(BMS.Status .Current)>13)
 	{
