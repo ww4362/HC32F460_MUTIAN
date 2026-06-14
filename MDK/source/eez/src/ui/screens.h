@@ -59,8 +59,6 @@ typedef struct _objects_t {
     lv_obj_t *bat5;
     lv_obj_t *bat3_1;
     lv_obj_t *err;
-    lv_obj_t *cap;
-    lv_obj_t *hea;
     lv_obj_t *wf;
     lv_obj_t *cpv;
     lv_obj_t *bat5_7;

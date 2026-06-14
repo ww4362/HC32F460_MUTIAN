@@ -39,17 +39,17 @@
 
 #define BAT_OverChargeWarn            4150  // 过充预警电压 4.15V
 #define BAT_OverChargeAlarm           4150  // 过充报警电压 4.15V
-#define BAT_OverChargeRecovery        3300  // 过充恢复电压 4.1V
+#define BAT_OverChargeRecovery        4150  // 过充恢复电压 4.1V
 
 #define BAT_OverDischargeWarn         3000  // 过放预警电压 3.0V
 #define BAT_OverDischargeAlarm        3000  // 过放报警电压 3.0V
-#define BAT_OverDischargeRecovery     3300  // 过放恢复电压 3.3V
+#define BAT_OverDischargeRecovery     3000  // 过放恢复电压 3.3V
 
-#define BAT_OverChargeCurrentWarn     500  // 充电过流电流 5A
-#define BAT_OverChargeCurrentAlarm    500  // 充电过流预警电流 3A
+#define BAT_OverChargeCurrentWarn     5000  // 充电过流电流 5A
+#define BAT_OverChargeCurrentAlarm    5000  // 充电过流预警电流 3A
 
-#define BAT_OverDischargeCurrentWarn  30000  // 放电过流电流 30A
-#define BAT_OverDischargeCurrentAlarm 30000  // 放电过流预警电流 3A
+#define BAT_OverDischargeCurrentWarn  30000 // 放电过流预警电流 30A
+#define BAT_OverDischargeCurrentAlarm 30000  // 放电过流警告电流 3A
 
 #define BAT_HighChargeTemperatureWarn     600   // 过温预警温度 60℃
 #define BAT_HighChargeTemperatureAlarm    600   // 过温报警温度 60℃

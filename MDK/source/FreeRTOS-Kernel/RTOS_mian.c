@@ -25,6 +25,7 @@ TaskHandle_t xLVG_Ref_screen=NULL;
  static TimerHandle_t  xbuttonTimer;
  static TimerHandle_t  xdataref;
  static TimerHandle_t  	xRef_screenTimer;
+  static TimerHandle_t  x10S_Countdown;
  
   TimerHandle_t xScreen_off;
 		
@@ -34,6 +35,8 @@ void lvgl_task(void *arg);
 void Write_flash(void);
 void get_temperature(void);
 
+
+ static void x10S_Countdown_func (TimerHandle_t xTimer);
 static void Data_ref(TimerHandle_t xTimer);
 static void cb(void);
 static TimerHandle_t  xLVGL_Tick;
@@ -134,7 +137,14 @@ void RTOS_START(void)
 	
 	);
 	
+		x10S_Countdown=xTimerCreate(
+			"Countdown",
+			pdMS_TO_TICKS(10000),
+			pdFALSE,        // 手动重载
+			NULL,
+			 x10S_Countdown_func
 	
+	);
 	
 	
 	
@@ -226,8 +236,8 @@ if(!BMS .Status.SwitchStatus[CHG])
 		if(ret==BMS_OK)
 		{
 			//写入8C 然后在写C
-			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF1, (sconf1>>8)|80);
-			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF1, (sconf1>>8)&~80);
+			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF1, (sconf1>>8)|0x80);
+			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF1, (sconf1>>8)&~0x80);
 			
 		}
 		
@@ -236,7 +246,7 @@ if(!BMS .Status.SwitchStatus[CHG])
  
 //均衡处理 
 cb();
-
+static uint8_t wait=0;
 //温度保护  根据报警找哪个报警了  执行不同策略 过充是内部自动关闭充电管 所以不做处理 只处理过放 
 if(ret==BMS_Alarm)
 {
@@ -247,15 +257,17 @@ if(ret==BMS_Alarm)
 		{
 			//说明出现了过放 关闭放电管 放电管关闭可以经过二极管充 
 			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
+			 wait=20;
 			break;
 		}
 	}
 	
 		//检测放电过流
-	if(BMS .State.I_Alarm[OverDischargeCurrentAlarm])
+	if(BMS .State.I_Alarm[ OverDischargeCurrentAlarm])
 	{
-		//出现了过流 关闭充电
+		//出现了过流 关闭放电
 		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
+		 wait=20;
 	}
 	
 	for(	int i=0;i<Temp_Count;i++)
@@ -272,13 +284,15 @@ if(ret==BMS_Alarm)
 	
 }
 //在ret 返回是ok时 说明没问题 需要检查充电管和放电管是否关闭 关闭了的话打开充放电进行必要的初始化
-if(ret==BMS_OK)
+
+if(ret==BMS_OK&&wait==0)
 {
 	//放电管 放电管重新打开需要初始6303v
 	if(BMS .Status.SwitchStatus[DSG]==0)
 	{
 			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x03);  //充放电一起打开
-		SW6306_Init();
+			xTimerStart( x10S_Countdown, 0);
+		
 	}
 	//充电管  只是充电管单独关闭了 
 	if(BMS .Status.SwitchStatus[CHG]==0)
@@ -286,6 +300,7 @@ if(ret==BMS_OK)
 		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x01);  //只需要打开充电即可
 	}
 }
+wait = (wait == 0) ? 0 : (wait - 1);
 
 
 
@@ -296,47 +311,6 @@ if(ret==BMS_OK)
 
 
 
-
-////////////过放保护 在放电过程中才检测过放
-//////////if(BMS.Status .Current>13)
-//////////{
-//////////	for(int i=0; i<Battery_Count;i++)
-//////////	{
-//////////		if(BMS.Status .BAT_Voltage [i]<BAT_OverDischargeAlarm)
-//////////		{
-//////////			//说明出现了过放
-//////////			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
-//////////			//过放如果还有能量的话 最大能量减去当前能量
-////////////			Batty_t.Energy_max-=Batty_t.Remaining_Energy;            ????????????????????
-////////////			Batty_t.Remaining_Energy=0;
-//////////			OD_Time = xTaskGetTickCount();
-//////////			 goto EXIT;
-//////////		}
-//////////		
-//////////	}
-//////////}
-//////////EXIT:
-
-//	//放电管关闭
-//if(!BMS .Status.SwitchStatus[DSG]&&((xTaskGetTickCount() - OD_Time ) >= pdMS_TO_TICKS(30000)))
-//{
-//	if(ret==BMS_OK)
-//	{
-//				I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x02);
-//			SW6306_Init();
-//	}
-//}
-//在充电过程中 如果放电管关闭了 要 第一时间打开  打开放电管需要重新初始化sw6306
-//if(BMS.Status .Current>13) 
-//{
-//	if(!BMS .Status.SwitchStatus[DSG])
-//	{
-//		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x02);
-//			SW6306_Init();
-//		
-//	}
-//	
-//}
 static uint16_t Countdown=0; //计时  1分钟进入停止模式 当前为500ms 定时器
 /*不在充放电就进行休眠*/
 if(BMS .Status.SwitchStatus[CHGING]==0 && BMS .Status.SwitchStatus[DSGING]==0)
@@ -399,9 +373,21 @@ if( Countdown>=360)
 						
 					}
 			}
+			//均衡状态不做容量结算
+		for(int j=0,i=0;i<Battery_Count;i++)
+{
+	if(!BMS.Status.CBxStatus[i])
+	{
+		j++;
+	}
+	if(j==5)
+	{
+		coulometer_ticks(BMS.Status.Current,BMS.Status.Pack_Voltage,adc_mode);
+	}
+}
+
 			
-			
-coulometer_ticks(BMS.Status.Current,BMS.Status.Pack_Voltage,adc_mode);
+
 static uint16_t i=0;
 			i++;
 if(i>7200)
@@ -451,6 +437,13 @@ static void button_Callback(TimerHandle_t xTimer)
 	  button_ticks();
  }
  
+ 
+ //10s 倒计时函数
+ static void x10S_Countdown_func (TimerHandle_t xTimer)
+ {
+	 
+	 SW6306_Init();
+ }
 
 void LVGL_Tick(TimerHandle_t xTimer)
 {
@@ -539,21 +532,21 @@ void sort_asc(uint16_t  *arr, int len)
         }
     }
 }
-
+uint8_t  buff=0;
 static void cb(void)
 {
 	uint16_t BAT_Voltage [Battery_Count];
-	uint8_t  buff=0;
+	
 	static TickType_t last_tick = 0;
 	memcpy(BAT_Voltage, BMS.Status .BAT_Voltage, sizeof(BAT_Voltage));
 	
 	//第一步 电压排序
 	sort_asc(BAT_Voltage, Battery_Count);
-	if(((BAT_Voltage [Battery_Count-1]>CB_SATRT_VOL)) &&((xTaskGetTickCount() - last_tick) >= pdMS_TO_TICKS(30000)))
+	if(((BAT_Voltage [Battery_Count-1]>CB_SATRT_VOL)) &&((xTaskGetTickCount() - last_tick) >= pdMS_TO_TICKS(32000)))
 	{
 		for(int i=0;i<Battery_Count;i++)
 		{
-				if((BMS.Status .BAT_Voltage[i]-BAT_Voltage[0])>10)
+				if((BMS.Status .BAT_Voltage[i]-BAT_Voltage[0])> CB_VD)
 				{
 					buff |= (0x01 << i);
 					
@@ -730,7 +723,7 @@ void lvgl_task(void *arg)
 				sprintf(buf, "%.2f",-BMS.Status.Current/1000.0f	);
 								lv_label_set_text(objects.p_cou, buf);	
 
-		sprintf(buf, "%.1f",((float)BMS.Status.Pack_Voltage /1000.0f)*((float)BMS.Status.Current/1000.0f));		
+		sprintf(buf, "%.1f",fabs(((float)BMS.Status.Pack_Voltage /1000.0f)*((float)BMS.Status.Current/1000.0f)));		
 					lv_label_set_text(objects.p_pow, buf);	
 					
 									sprintf(buf, "%u", CoulombCounter.SOC);
@@ -770,21 +763,21 @@ void lvgl_task(void *arg)
 						
 		sprintf(buf, "%u", BMS.Status .BAT_Voltage [1]);
 					lv_label_set_text(objects.bat2, buf);
-										if(BMS.Status.CBxStatus[1])
+					if(BMS.Status.CBxStatus[1])
 					{lv_obj_set_style_text_color(objects.bat2, lv_color_hex(0xFF0000),LV_PART_MAIN);;
 					}else{lv_obj_set_style_text_color(objects.bat2, lv_color_hex(0xFFFFFF),LV_PART_MAIN);
 					}
 					
 		sprintf(buf, "%u", BMS.Status .BAT_Voltage [2]);
 					lv_label_set_text(objects.bat3, buf);
-										if(BMS.Status.CBxStatus[2])
+					if(BMS.Status.CBxStatus[2])
 					{lv_obj_set_style_text_color(objects.bat3, lv_color_hex(0xFF0000),LV_PART_MAIN);;
 					}else{lv_obj_set_style_text_color(objects.bat3, lv_color_hex(0xFFFFFF),LV_PART_MAIN);
 					}
 					
 		sprintf(buf, "%u", BMS.Status .BAT_Voltage [3]);
 					lv_label_set_text(objects.bat4, buf);	
-										if(BMS.Status.CBxStatus[3])
+					if(BMS.Status.CBxStatus[3])
 					{lv_obj_set_style_text_color(objects.bat4, lv_color_hex(0xFF0000),LV_PART_MAIN);;
 					}else{lv_obj_set_style_text_color(objects.bat4, lv_color_hex(0xFFFFFF),LV_PART_MAIN);
 					}

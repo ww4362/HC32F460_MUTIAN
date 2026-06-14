@@ -573,7 +573,7 @@ void create_screen_system() {
             lv_obj_set_style_text_font(obj, &ui_font_7px_1, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_letter_space(obj, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text_static(obj, "1\n2\n3\n4\n5\nERR\nCAP \nHEA \n\nCPV\nPRV");
+            lv_label_set_text_static(obj, "1\n2\n3\n4\n5\nERR\n\n\n\nCPV\nPRV");
         }
         {
             // ERR
@@ -585,28 +585,6 @@ void create_screen_system() {
             lv_obj_set_style_text_font(obj, &ui_font_7px_1, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_label_set_text_static(obj, "O K");
-        }
-        {
-            // CAP
-            lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.cap = obj;
-            lv_obj_set_pos(obj, 19, 43);
-            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_font(obj, &ui_font_7px_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text_static(obj, "9999");
-        }
-        {
-            // HEA
-            lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.hea = obj;
-            lv_obj_set_pos(obj, 19, 50);
-            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_obj_set_style_text_color(obj, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_font(obj, &ui_font_7px_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text_static(obj, "99");
         }
         {
             // WF

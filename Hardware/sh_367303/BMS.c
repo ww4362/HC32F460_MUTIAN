@@ -128,9 +128,9 @@ BMS_ReturnTypeDef BMS_Read_CBStatus(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
     // 调用读取均衡通道状态的函数
 	uint16_t buf=0;
 		buf=SH36730X_Read_CBStatus();
-	for(int i=0;i<Battery_Count-1;i++)
+	for(int i=0;i<Battery_Count;i++)
 	{
-		BMS->Status.CBxStatus[i]=(buf>i)&0x01;
+		BMS->Status.CBxStatus[i]=(buf>>i)&0x01;
 		
 		
 	}
@@ -252,12 +252,14 @@ BMS_ReturnTypeDef BMS_Status_Cacluate(BMSTypeDef *BMS) {
         }
     }
 		
-//-----------------------充电 电流检测-----------------------------------------*/		
-		if (BMS->Status.SwitchStatus[CHGING])
+//-----------------------放电过 电流检测-----------------------------------------*/		
+
+		if(BMS->Status.Current<-BAT_OverDischargeCurrentAlarm)
 		{
-			if(BMS->Status.Current>BAT_OverChargeCurrentWarn)
-			BMS->State.I_Alarm[OverChargeCurrentWarn]=true;
+			BMS->State.I_Alarm[ OverDischargeCurrentAlarm]=true;
 			
+		}else{
+			BMS->State.I_Alarm[ OverDischargeCurrentAlarm]=false;
 		}
 		
 		//-----------------------充电 高温、低温监测--- 充电作为全局 不区分充电高温还是放电高温 没意义---------------------------------------*/
