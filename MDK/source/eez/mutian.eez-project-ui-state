@@ -1,7 +1,7 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[mutian.eez-project]:/userPages/1",
-    "selectedFontObject": "[mutian.eez-project]:/fonts/0",
+    "selectedUserPageObject": "[mutian.eez-project]:/userPages/0",
+    "selectedFontObject": "[mutian.eez-project]:/fonts/5",
     "subnavigationSelectedItems": {}
   },
   "layoutModel": {
@@ -22,7 +22,7 @@
           },
           {
             "type": "border",
-            "selected": 4,
+            "selected": 1,
             "size": 240,
             "location": "right",
             "children": [
@@ -189,16 +189,31 @@
               "type": "tabset",
               "id": "EDITORS",
               "weight": 54.642857142857146,
+              "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
                 {
                   "type": "tab",
-                  "id": "#a189e278-8f2e-4c5e-8a3c-e3bbd05e4ae2",
-                  "name": "Power bank",
+                  "id": "#dce6e5c2-6ba8-4a4d-b987-9c55b1df1d36",
+                  "name": "5x9",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[mutian.eez-project]:/userPages/1",
+                    "objectPath": "[mutian.eez-project]:/fonts/5",
+                    "params": {
+                      "forceOpenEditor": true
+                    },
+                    "permanent": false
+                  },
+                  "icon": "material:font_download"
+                },
+                {
+                  "type": "tab",
+                  "id": "#a189e278-8f2e-4c5e-8a3c-e3bbd05e4ae2",
+                  "name": "Main",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[mutian.eez-project]:/userPages/0",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -206,7 +221,7 @@
                 {
                   "type": "tab",
                   "id": "#50cf3ba8-f716-4e41-8525-a86e6594edb4",
-                  "name": "system",
+                  "name": "Power bank",
                   "component": "editor",
                   "config": {
                     "objectPath": "[mutian.eez-project]:/userPages/1",
@@ -696,7 +711,8 @@
                   "component": "editor",
                   "enableClose": false
                 }
-              ]
+              ],
+              "active": true
             }
           ]
         }
@@ -1066,12 +1082,17 @@
     "[mutian.eez-project]:/userPages/0[flow-state]": {
       "selectionFront": {},
       "selectionBack": {
-        "0": {}
+        "0": {
+          "1": {
+            "$selected": true
+          },
+          "10": {}
+        }
       },
       "transform": {
         "translate": {
-          "x": -227.33334350585938,
-          "y": -170.66668701171875
+          "x": -338.6667175292969,
+          "y": -158.00003051757812
         },
         "scale": 4
       },
@@ -1086,9 +1107,7 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
-          "1": {
-            "$selected": true
-          },
+          "1": {},
           "7": {}
         }
       },

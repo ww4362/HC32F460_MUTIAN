@@ -24,29 +24,35 @@
 //#define USING_SH367309
 #define USING_UART
 
-#define DSC_V_MAX   0x255  //充电保护电压 寄存器值 x5.86 
+#define DSC_V_MAX   0x2C4	  //充电保护电压 寄存器值 x5.86 
 
 #define ON 1
 #define OFF 0
 #define true 1
 #define false 0
+	
 
-#define BAT_OverChargeWarn            3600  // 过充预警电压 4.2V
-#define BAT_OverChargeAlarm           3600  // 过充报警电压 4.5V
-#define BAT_OverChargeRecovery        3500  // 过充恢复电压 4.1V
 
-#define BAT_OverDischargeWarn         2700  // 过放预警电压 3.3V
-#define BAT_OverDischargeAlarm        3200  // 过放报警电压 3.0V
-#define BAT_OverDischargeRecovery     3000  // 过放恢复电压 3.4V
+#define CB_SATRT_VOL   4100   //均衡启动电压 单位 mv
+#define CB_VD          10    //均衡电压差   单位 mv
+
+
+#define BAT_OverChargeWarn            4150  // 过充预警电压 4.15V
+#define BAT_OverChargeAlarm           4150  // 过充报警电压 4.15V
+#define BAT_OverChargeRecovery        3300  // 过充恢复电压 4.1V
+
+#define BAT_OverDischargeWarn         3000  // 过放预警电压 3.0V
+#define BAT_OverDischargeAlarm        3000  // 过放报警电压 3.0V
+#define BAT_OverDischargeRecovery     3300  // 过放恢复电压 3.3V
 
 #define BAT_OverChargeCurrentWarn     500  // 充电过流电流 5A
-#define BAT_OverChargeCurrentAlarm    300  // 充电过流预警电流 3A
+#define BAT_OverChargeCurrentAlarm    500  // 充电过流预警电流 3A
 
 #define BAT_OverDischargeCurrentWarn  30000  // 放电过流电流 30A
 #define BAT_OverDischargeCurrentAlarm 30000  // 放电过流预警电流 3A
 
 #define BAT_HighChargeTemperatureWarn     600   // 过温预警温度 60℃
-#define BAT_HighChargeTemperatureAlarm    600   // 过温预警温度 60℃
+#define BAT_HighChargeTemperatureAlarm    600   // 过温报警温度 60℃
 #define BAT_HighChargeTemperatureRecovery 500   // 过温恢复温度 50℃
 
 #define BAT_LowChargeTemperatureWarn     (-100) // 低温预警温度 -10℃
@@ -145,15 +151,17 @@ enum T_AlarmType{
     DischargeHighTemperatureAlarm,       //放电 高温报警
 
     DischargeLowTemperatureWarn,         //放电 低温警告
-    DischargeLowTemperatureAlarm         //放电 低温报警
+	DischargeLowTemperatureAlarm         //放电 低温报警  温度检测为什么要区分充电高温和放电高温 不都是高温嘛 
 };
+
+
 
 typedef struct {
     uint16_t BAT_Voltage[Battery_Count];//单电池电压 3300 = 3.300V
     uint16_t Pack_Voltage;         //单电池电压 58000 = 58.000V
 	//uint16_t Current;               //电池组电流  100 = 1.00A +为充电 -为放电 原来的莫名其妙 注释掉
 	float Current ;						//单位 毫安
-    int16_t Temperature[Temp_Count]; //温度 3850 = 38.5°C
+	int16_t Temperature[Temp_Count]; //温度 3850 = 38.5°C  修改过 现在没有小数点 直接显示整数温度
     uint8_t SwitchStatus[6];          // 开关状态（负载检测、充电检测、MOS 状态等）1开启 0关闭
 	uint8_t CBxStatus[Battery_Count];//均衡通道状态 1开启 0关闭   均衡通道状态当然是电池数量 不知道作者写减一是啥意思
 } BMS_StatusTypeDef; //存储电池初始采集状态
@@ -167,8 +175,8 @@ typedef struct {
     uint16_t DOD; //电池包放电深度，Depth of discharge
     uint16_t SOE; //电池剩余能量，Stete of Energy
     uint8_t V_Alarm[4][Battery_Count]; // BMS电压报警 报警类型为AlarmType
-    uint8_t T_Alarm[4];             // BMS温度报警 报警类型为AlarmType
-    uint8_t I_Alarm[8][Temp_Count];// BMS电流报警 报警类型为AlarmType
+    uint8_t I_Alarm[4];             // BMS电流报警 报警类型为AlarmType
+    uint8_t T_Alarm[8][Temp_Count];// BMS温度报警报警 报警类型为AlarmType 
 } BMS_StateTypeDef; //存储电池计算后状态 需保存至EEPROM
 
 typedef struct {

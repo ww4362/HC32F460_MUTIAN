@@ -48,7 +48,7 @@ extern C {
 #define SW6306_NTC_B                    3435
 #endif
 
-#define SW6306_BAT_FCV                17500      //单位  毫伏  
+#define SW6306_BAT_FCV                20750     //单位  毫伏  
 
 
 

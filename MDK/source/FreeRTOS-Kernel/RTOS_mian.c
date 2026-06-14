@@ -10,12 +10,14 @@
 #include "sw6306.h"
 #include "sw6306_IIC.h"  
 #include "flash.h"
+#include "Coulometer.h" 
 
 
 #include <math.h>
 extern    struct SW6306_StatusTypedef SW6306_Status;//SW6306状态全局变量
 
-static CoulombCounter_t Batty_t;
+enum adc_mode_t adc_mode;
+
 
 TaskHandle_t xLVGL_timer_handler=NULL;
 TaskHandle_t xLVG_Ref_screen=NULL;
@@ -24,17 +26,21 @@ TaskHandle_t xLVG_Ref_screen=NULL;
  static TimerHandle_t  xdataref;
  static TimerHandle_t  	xRef_screenTimer;
  
+  TimerHandle_t xScreen_off;
+		
+ 
 void LVGL_Tick(TimerHandle_t xTimer);
 void lvgl_task(void *arg);	
-void read_struct(CoulombCounter_t *bat);
 void Write_flash(void);
-void Coulometer(void);
+void get_temperature(void);
 
 static void Data_ref(TimerHandle_t xTimer);
 static void cb(void);
 static TimerHandle_t  xLVGL_Tick;
 static void button_Callback(TimerHandle_t xTimer);
 static void Ref_screen(void *arg);
+static void xScreen_off_func(TimerHandle_t xTimer);
+
 void RTOS_START(void)
 {
 	
@@ -106,6 +112,8 @@ void RTOS_START(void)
 			button_Callback
 	);
 	
+		xTimerStart(xbuttonTimer, 0);
+	
 	// 500ms刷新一次数据
 		xdataref=xTimerCreate(
 			"button",
@@ -115,13 +123,22 @@ void RTOS_START(void)
 			Data_ref
 	);
 	
-	
-	
-	
-	
-	
-	xTimerStart(xbuttonTimer, 0);
 		xTimerStart(xdataref, 0);
+
+	xScreen_off=xTimerCreate(
+			"Screen",
+			pdMS_TO_TICKS(60000),
+			pdFALSE,        // 手动重载
+			NULL,
+			 xScreen_off_func
+	
+	);
+	
+	
+	
+	
+	
+
 	
 //	xRef_screenTimer=xTimerCreate(
 //			"button",
@@ -137,7 +154,7 @@ DDL_DelayMS(1000);
 	SW6306_Init();
   SW6306_PowerLoad();
 
-read_struct(&Batty_t);  //把电池参数读取进内存
+coulometer_init();  //把电池参数读取进内存
 
 
 
@@ -171,7 +188,8 @@ static void Data_ref(TimerHandle_t xTimer)
 	if(adc_flag &0x03)
 	{
 		
-		
+		/*温度获取并且传入数组中 兼容库*/
+get_temperature();
 			BMS_Read_Status(dev, &BMS);
 		ret=BMS_Status_Cacluate(&BMS);
 		
@@ -197,13 +215,13 @@ static void Data_ref(TimerHandle_t xTimer)
 
 	/*各种异常处理*/
 	
-	//充电管关闭
+	//充电管关闭 硬件过充处理
 if(!BMS .Status.SwitchStatus[CHG])
 {
 	if(adc_flag&0x400)
 	{
 		
-		Batty_t.Energy_max=Batty_t.Remaining_Energy;
+//		Batty_t.Energy_max=Batty_t.Remaining_Energy; ???????????????????????????????????????????????
 		//说明出现了过充 
 		if(ret==BMS_OK)
 		{
@@ -219,60 +237,127 @@ if(!BMS .Status.SwitchStatus[CHG])
 //均衡处理 
 cb();
 
-//库仑计处理
-Coulometer();
- //写参数进内存
-static uint16_t i=0;
-i++;
-if(i>7200)
+//温度保护  根据报警找哪个报警了  执行不同策略 过充是内部自动关闭充电管 所以不做处理 只处理过放 
+if(ret==BMS_Alarm)
 {
-	Batty_t.Capacity_mAh=9800;
-	Batty_t.flash_count++;
-	
-	Write_flash();
-	i=0;
-}
-
-//过放保护 在放电过程中才检测过放
-if(BMS.Status .Current>13)
-{
-	for(int i=0; i<Battery_Count;i++)
+	for(int i=0;i<Battery_Count;i++)
 	{
-		if(BMS.Status .BAT_Voltage [i]<BAT_OverDischargeAlarm)
+		//过放报警
+		if(	BMS .State.V_Alarm[OverDischargeAlarm][i])
 		{
-			//说明出现了过放
+			//说明出现了过放 关闭放电管 放电管关闭可以经过二极管充 
 			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
-			//过放如果还有能量的话 最大能量减去当前能量
-			Batty_t.Energy_max-=Batty_t.Remaining_Energy;
-			Batty_t.Remaining_Energy=0;
-			OD_Time = xTaskGetTickCount();
-			 goto EXIT;
+			break;
+		}
+	}
+	
+		//检测放电过流
+	if(BMS .State.I_Alarm[OverDischargeCurrentAlarm])
+	{
+		//出现了过流 关闭充电
+		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
+	}
+	
+	for(	int i=0;i<Temp_Count;i++)
+	{
+		//检测到高温 
+		if (BMS .State.T_Alarm[ChargeHighTemperatureAlarm][i])
+		{
+			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x03);  //充放电一起关闭
+				break;
 		}
 		
 	}
-}
-EXIT:
 
-	//放电管关闭
-if(!BMS .Status.SwitchStatus[DSG]&&((xTaskGetTickCount() - OD_Time ) >= pdMS_TO_TICKS(30000)))
-{
-	if(ret==BMS_OK)
-	{
-				I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x02);
-			SW6306_Init();
-	}
-}
-//在充电过程中 如果放电管关闭了 要 第一时间打开  打开放电管需要重新初始化sw6306
-if(BMS.Status .Current<-13) 
-{
-	if(!BMS .Status.SwitchStatus[DSG])
-	{
-		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x02);
-			SW6306_Init();
-		
-	}
 	
 }
+//在ret 返回是ok时 说明没问题 需要检查充电管和放电管是否关闭 关闭了的话打开充放电进行必要的初始化
+if(ret==BMS_OK)
+{
+	//放电管 放电管重新打开需要初始6303v
+	if(BMS .Status.SwitchStatus[DSG]==0)
+	{
+			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x03);  //充放电一起打开
+		SW6306_Init();
+	}
+	//充电管  只是充电管单独关闭了 
+	if(BMS .Status.SwitchStatus[CHG]==0)
+	{
+		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x01);  //只需要打开充电即可
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+////////////过放保护 在放电过程中才检测过放
+//////////if(BMS.Status .Current>13)
+//////////{
+//////////	for(int i=0; i<Battery_Count;i++)
+//////////	{
+//////////		if(BMS.Status .BAT_Voltage [i]<BAT_OverDischargeAlarm)
+//////////		{
+//////////			//说明出现了过放
+//////////			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
+//////////			//过放如果还有能量的话 最大能量减去当前能量
+////////////			Batty_t.Energy_max-=Batty_t.Remaining_Energy;            ????????????????????
+////////////			Batty_t.Remaining_Energy=0;
+//////////			OD_Time = xTaskGetTickCount();
+//////////			 goto EXIT;
+//////////		}
+//////////		
+//////////	}
+//////////}
+//////////EXIT:
+
+//	//放电管关闭
+//if(!BMS .Status.SwitchStatus[DSG]&&((xTaskGetTickCount() - OD_Time ) >= pdMS_TO_TICKS(30000)))
+//{
+//	if(ret==BMS_OK)
+//	{
+//				I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x02);
+//			SW6306_Init();
+//	}
+//}
+//在充电过程中 如果放电管关闭了 要 第一时间打开  打开放电管需要重新初始化sw6306
+//if(BMS.Status .Current>13) 
+//{
+//	if(!BMS .Status.SwitchStatus[DSG])
+//	{
+//		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x02);
+//			SW6306_Init();
+//		
+//	}
+//	
+//}
+static uint16_t Countdown=0; //计时  1分钟进入停止模式 当前为500ms 定时器
+/*不在充放电就进行休眠*/
+if(BMS .Status.SwitchStatus[CHGING]==0 && BMS .Status.SwitchStatus[DSGING]==0)
+{
+	
+	 Countdown++;
+	
+}else{
+	Countdown=0;
+}
+
+if( Countdown>=360)
+{
+		Countdown=0;
+		xTimerStop(xbuttonTimer, 0);
+	Run_STOP ();
+	vTaskDelay(pdMS_TO_TICKS(500));
+		xTimerStart(xbuttonTimer, 0);
+	
+}
+
 		
 //      DDL_DelayMS(2);
 //        SW6306_CapacityLoad();
@@ -297,9 +382,39 @@ if(BMS.Status .Current<-13)
 //			BMS_Control_Update(dev, &BMS);
 //		}
 							
-			//	
+			//	 状态判断 判断是否从充满
+			adc_mode=none;
+			for(int i=0; i<Battery_Count;i++)
+			{
 
+				if(BMS.Status .BAT_Voltage[i]<BAT_OverDischargeAlarm )
+				{
+				adc_mode=Low_battery;
+					break;
+				}
+				
+					if(adc_flag&0x400)
+					{
+						adc_mode=high_battery;
+						
+					}
+			}
+			
+			
+coulometer_ticks(BMS.Status.Current,BMS.Status.Pack_Voltage,adc_mode);
+static uint16_t i=0;
+			i++;
+if(i>7200)
+{
+	CoulombCounter.CoulombCounter_flash.flash_count++;
 
+	
+	Write_flash();
+	i=0;
+}
+			
+			
+			
 refresh_flag++;
 		
 //	taskEXIT_CRITICAL();
@@ -308,8 +423,13 @@ refresh_flag++;
 }
 
 
-
-
+/*息屏处理函数*/
+static void xScreen_off_func(TimerHandle_t xTimer)
+{
+	
+	CM_TMRA_1->CMPAR6=10;
+	
+}
 
 static void Ref_screen(void *arg)
 {
@@ -340,85 +460,63 @@ void LVGL_Tick(TimerHandle_t xTimer)
 
 
 }
-void Coulometer(void)
+/*把电阻值转换成温度
+r0 25度时阻值
+beta b值
+*/
+uint16_t R1;
+double T;
+int16_t Temperature_Conversion(uint16_t R0,uint16_t BETA,uint16_t R)
 {
-	static uint8_t tpm_SOC=0; //记录上一时刻电量
-//	//过充警告 出来表示充电到了100% 强制把剩余电量拉到100%
-//		if(!BMS .Status.SwitchStatus[CHG])
-//	{
-//		if(I2C_ReadReg2Byte_CRC8(SH_ADDR , SH_FLAG1 )&0x400)
-//		{
-//		Batty_t.SOC=100;
-//		Batty_t.Energy_max=	Batty_t.Remaining_Energy;
-//		}
-//	}	
-	
-	if(fabsf(BMS.Status .Current)>13)
-	{
-		//电流大于13进行统计
-		Batty_t.Remaining_Energy+=(BMS.Status.Pack_Voltage /1000.0f*(-BMS.Status.Current)/7200.f);
-		if(Batty_t.Remaining_Energy<0)
-		{
-			Batty_t.Remaining_Energy=0;
-		}	
-		if(Batty_t.Remaining_Energy>Batty_t.theory_Energy_max)	
-		{
-			Batty_t.Remaining_Energy=Batty_t.theory_Energy_max;
-		}
-		
-		if(Batty_t.Remaining_Energy>Batty_t.Energy_max)
-		{
-			
-			Batty_t.Energy_max=Batty_t.Remaining_Energy;
-		}
-
-			}	
-		
-		
-	Batty_t.SOC=(uint8_t)((Batty_t.Remaining_Energy/Batty_t.Energy_max)*100);  //计算百分比
-	// 计算循环
-	if(Batty_t.SOC<tpm_SOC)  
-	{
-		Batty_t.Cycle_Percentage+=(tpm_SOC-Batty_t.SOC);
-
-			
-		
-	}
-	tpm_SOC=Batty_t.SOC;
+R1=R;
+	T = 1.0 / ( (1.0 / 298.15) + (1.0 / (float)BETA) * log((float)R / R0) );
 	
 	
+	return (int16_t)((T - 273.15)*10);
 }
 
-#define FLASH_SAVE_ADDR  0x0007E000
+/*获取温度
+ch 通道
+0 sw6306v 内部温度
+1sh367303内部温度
+2 sh367303 板载探头温度
+3 sh367303 电池温度探头温度*/
+	
+void get_temperature(void)
+{
+	 uint16_t data;
+	data=	I2C_ReadReg2Byte_CRC8(SH_ADDR, SH_TEMP1H );
+	
+	BMS.Status.Temperature[0]=(0.17*(float)data-270-20)*10;   //注意 芯片由于ldo温度较高 减去20度避免触发温控处理  显示温度加10度
+
+		data=	I2C_ReadReg2Byte_CRC8(SH_ADDR, SH_TS1H );   //带线热敏电阻
+
+   BMS.Status.Temperature[1]=  Temperature_Conversion(10000,3950,(float)data/(4096-data)*10000);
+
+	
+	
+	
+			data=	I2C_ReadReg2Byte_CRC8(SH_ADDR, SH_TS2H );  //板载热敏电阻
+	
+		   BMS.Status.Temperature[2]=  Temperature_Conversion(10000,3450,(float)data/(4096-data)*10000);
+//		
+
+
+}
+
+
+
+
 //写flash
 void Write_flash(void)
 {
-	uint8_t buff[1]={0xAA};
 						EFM_FWMC_Cmd(ENABLE); //解锁
 						(void)FLASH_EraseSector(0x0007E000,0);
-	FLASH_WriteData(FLASH_SAVE_ADDR,(uint8_t *) &Batty_t,sizeof(Batty_t));
+	FLASH_WriteData(FLASH_SAVE_ADDR,(uint8_t *) &CoulombCounter.CoulombCounter_flash,sizeof(CoulombCounter_flash_t));
 	
 	
 	EFM_FWMC_Cmd(DISABLE); //解锁
 	
-}
-void read_struct(CoulombCounter_t *bat)
-{
-	 CoulombCounter_t *flash_data = (CoulombCounter_t*)FLASH_SAVE_ADDR;
-		memcpy(bat, (void *)FLASH_SAVE_ADDR, sizeof(CoulombCounter_t));
-	if(bat->flash_count ==0xFFFF)
-	{
-		//说明是没初始化过的结构体 先进行初始化
-		
-		
-		bat->Capacity_mAh=3000;
-		bat->theory_Energy_max=48000;
-		bat->flash_count=0;
-		bat->SOC=0;
-		bat->Remaining_Energy=0;
-		bat->Energy_max=0;
-		bat->Cycle_Percentage=0;
-	}
 }
 
 
@@ -491,14 +589,40 @@ void lvgl_task(void *arg)
 					sprintf(buf, "%.2f",(SW6306_Status.vbus*SW6306_Status.ibus)/1000000.f);	
 					lv_label_set_text(objects.pow, buf);
 					
+					
+					
+					
+					
 //					pbat=SW6306_Status.vbus*SW6306_Status.ibus;
 //					pout=SW6306_Status.ibat*SW6306_Status.vbat;
 //					
 //					sprintf(buf, "%.2f",pout/pbat*100.0f);	
 //					lv_label_set_text(objects.eef, buf);
 					
-				sprintf(buf, "%u", Batty_t.SOC);
+				sprintf(buf, "%u", CoulombCounter.SOC);
 					lv_label_set_text(objects.m_per, buf);
+					
+					
+					
+														sprintf(buf, "%u", CoulombCounter.SOC);
+					lv_label_set_text(objects.p_per, buf);
+					
+						sprintf(buf, "%u",   BMS.Status.Temperature[1]/10);
+					lv_label_set_text(objects.temp_4, buf);	
+											sprintf(buf, "%u",   BMS.Status.Temperature[2]/10);
+					lv_label_set_text(objects.temp_3, buf);	
+											sprintf(buf, "%u",   BMS.Status.Temperature[0]/10+20);
+					lv_label_set_text(objects.temp_2, buf);	
+					
+									sprintf(buf, "%u",(int16_t)SW6306_ReadTCHIP()	);
+								lv_label_set_text(objects.temp_1, buf);	
+					
+					
+					
+					
+					
+					
+					
 					//快充协议显示
 					if(!(SW6306_Status.qcstat & SW6306_QCSTAT_PQC))
 					{
@@ -573,6 +697,13 @@ void lvgl_task(void *arg)
 							lv_label_set_text(objects.dc_flag, "放");
 							sprintf(buf, "%.1f",(((SW6306_Status.vbus*SW6306_Status.ibus)/1000000.f) )/ fabsf((((float)BMS.Status.Pack_Voltage /1000.0f)*((float)BMS.Status.Current/1000.0f))) *100);	
 					lv_label_set_text(objects.eef, buf);
+							
+						
+							
+//														sprintf(buf, "%.2f",	(float)(SW6306_ReadIBAT()/1000));		
+				lv_label_set_text(objects.eef, buf);	
+							
+							
 						}else{
 							lv_label_set_text(objects.dc_flag, "关");
 
@@ -583,8 +714,9 @@ void lvgl_task(void *arg)
 					lv_label_set_text(objects.pow, "0.00");
 
 					lv_label_set_text(objects.eef, "0.00");
-							
-							
+					
+
+								lv_label_set_text(objects.temp_1, "--");	
 							
 							
 						}
@@ -595,14 +727,23 @@ void lvgl_task(void *arg)
 		sprintf(buf, "%.2f",BMS.Status.Pack_Voltage /1000.0f);		
 				lv_label_set_text(objects.p_vol, buf);	
 					
-				sprintf(buf, "%.2f",BMS.Status.Current/1000.0f	);
+				sprintf(buf, "%.2f",-BMS.Status.Current/1000.0f	);
 								lv_label_set_text(objects.p_cou, buf);	
 
 		sprintf(buf, "%.1f",((float)BMS.Status.Pack_Voltage /1000.0f)*((float)BMS.Status.Current/1000.0f));		
 					lv_label_set_text(objects.p_pow, buf);	
 					
-									sprintf(buf, "%u", Batty_t.SOC);
+									sprintf(buf, "%u", CoulombCounter.SOC);
 					lv_label_set_text(objects.p_per, buf);
+					
+						sprintf(buf, "%u",   BMS.Status.Temperature[1]/10);
+					lv_label_set_text(objects.temp_7, buf);	
+											sprintf(buf, "%u",   BMS.Status.Temperature[0]/10+20);
+					lv_label_set_text(objects.temp_5, buf);	
+											sprintf(buf, "%u",   BMS.Status.Temperature[2]/10);
+					lv_label_set_text(objects.temp_6, buf);	
+
+					
 					
 					if(BMS.Status.SwitchStatus[CHG]==0)
 					{
@@ -666,28 +807,57 @@ void lvgl_task(void *arg)
 						lv_label_set_text(objects.err,"err");
 					}
 					
-					sprintf(buf, "%u", Batty_t.flash_count);   //读取flash写入次数
+					sprintf(buf, "%u", CoulombCounter.CoulombCounter_flash.flash_count);   //读取flash写入次数
 					lv_label_set_text(objects.wf, buf);
+					
+					
+					if((SW6306_Status.vbus_chg&7)==SW6306_VBUS_CHG_RQST_5V)
+					{
+						sprintf(buf, "%u", 5);
+					}else if((SW6306_Status.vbus_chg&7)==SW6306_VBUS_CHG_RQST_9V)
+					{
+						sprintf(buf, "%u", 9);
+					}else if((SW6306_Status.vbus_chg&7)==SW6306_VBUS_CHG_RQST_12V)
+					{
+						sprintf(buf, "%u", 12);
+					}else if((SW6306_Status.vbus_chg&7)==SW6306_VBUS_CHG_RQST_15V)
+					{
+						sprintf(buf, "%u", 15);
+					}else if((SW6306_Status.vbus_chg&7)==SW6306_VBUS_CHG_RQST_20V)
+					{
+						sprintf(buf, "%u", 20);
+					}
+					
+					lv_label_set_text(objects.iacv, buf);
+					
 					
 					sprintf(buf, "%u", SW6306_ReadIPortLimit());   //读取实时端口限流值  单位 mA
 					lv_label_set_text(objects.ibuc, buf);
-										sprintf(buf, "%u", SW6306_ReadIBattLimit());   //读取实时电池限流值  单位 mA
+					sprintf(buf, "%u", SW6306_ReadIBattLimit());   //读取实时电池限流值  单位 mA
 					lv_label_set_text(objects.ibac, buf);
-										sprintf(buf, "%u", SW6306_ReadMaxInputPower());   //输入最大功率
+					sprintf(buf, "%u", SW6306_ReadMaxInputPower());   //输入最大功率
 					lv_label_set_text(objects.ipm, buf);
-										sprintf(buf, "%u", SW6306_ReadMaxOutputPower());   //输出最大功率
+					sprintf(buf, "%u", SW6306_ReadMaxOutputPower());   //输出最大功率
 					lv_label_set_text(objects.opm, buf);
 					sprintf(buf, "%u", SW6306_BAT_FCV);   //浮充限制电压
 					lv_label_set_text(objects.fcv, buf);
+					sprintf(buf, "%u", BAT_OverDischargeAlarm);   //过放保护电压
+					lv_label_set_text(objects.prv, buf);
 					
 					
-					sprintf(buf, "%.0f", Batty_t.Energy_max);   //最大能量
+					
+					
+					sprintf(buf, "%.0f", CoulombCounter.CoulombCounter_flash.Energy_max);   //最大能量
 					lv_label_set_text(objects.enm, buf);
 					
-										sprintf(buf, "%.0f", Batty_t.Remaining_Energy);   //剩余能量
+					sprintf(buf, "%.0f", CoulombCounter.CoulombCounter_flash.Remaining_Energy);   //剩余能量
 					lv_label_set_text(objects.ree, buf);
-										sprintf(buf, "%u", Batty_t.Cycle_Percentage);   //循环百分比
+					sprintf(buf, "%u", CoulombCounter.CoulombCounter_flash.Cycle_Percentage);   //循环百分比
 					lv_label_set_text(objects.cyp, buf);
+					sprintf(buf, "%u", CoulombCounter.healthy);   //健康度
+					lv_label_set_text(objects.hes, buf);
+					
+					
 						break;
 					
 					

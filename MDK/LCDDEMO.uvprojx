@@ -315,7 +315,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>0</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -599,6 +599,16 @@
               <FileName>flash.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Hardware\sh_367303\flash.h</FilePath>
+            </File>
+            <File>
+              <FileName>Coulometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Coulometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>Coulometer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\Coulometer.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1609,6 +1619,16 @@
               <FileName>flash.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Hardware\sh_367303\flash.h</FilePath>
+            </File>
+            <File>
+              <FileName>Coulometer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Coulometer.c</FilePath>
+            </File>
+            <File>
+              <FileName>Coulometer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Hardware\Coulometer.h</FilePath>
             </File>
           </Files>
         </Group>

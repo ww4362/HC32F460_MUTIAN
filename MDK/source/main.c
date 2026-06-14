@@ -30,6 +30,7 @@
 #include "SH367303.h"
 #include "sw6306.h" 
 #include "sw6306_IIC.h"  
+#include "timers.h"
 /*******************************************************************************
  * Local type definitions ('typedef')
  ******************************************************************************/
@@ -167,35 +168,67 @@ static void App_PortCfg(void)
     (void)GPIO_StructInit(&stcGpioInit);
     stcGpioInit.u16PullUp = PIN_PU_ON;
     stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+		stcGpioInit.u16ExtInt =PIN_EXTINT_ON  ;
     (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_08, &stcGpioInit);
 
-//		stc_extint_init_t stcExtIntInit;
-//    stc_irq_signin_config_t stcIrqSignConfig;		
-//		
-//    /* ExtInt config */
-//    (void)EXTINT_StructInit(&stcExtIntInit);
-//    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
-//    (void)EXTINT_Init(EXTINT_CH08, &stcExtIntInit);
+		stc_extint_init_t stcExtIntInit;
+    stc_irq_signin_config_t stcIrqSignConfig;		
+		
+    /* ExtInt config */
+    (void)EXTINT_StructInit(&stcExtIntInit);
+    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
+    (void)EXTINT_Init(EXTINT_CH08, &stcExtIntInit);
 
-//    /* IRQ sign-in */
-//    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ8 ;
-//    stcIrqSignConfig.enIRQn      = INT008_IRQn;
-//    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA08_IrqCallback;
-//    (void)INTC_IrqSignIn(&stcIrqSignConfig);
+    /* IRQ sign-in */
+    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ8 ;
+    stcIrqSignConfig.enIRQn      = INT008_IRQn;
+    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA08_IrqCallback;
+    (void)INTC_IrqSignIn(&stcIrqSignConfig);
 
-//    /* Disable all */
-//    INTC_IntCmd(INTC_INT8, ENABLE);   //启用中断 
-//    /* NVIC config */
-//    NVIC_ClearPendingIRQ(INT008_IRQn);  //清除下事件 
-//		
-//    NVIC_SetPriority(INT008_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
-//		NVIC_EnableIRQ(INT008_IRQn); // 
+    /* Disable all */
+    INTC_IntCmd(INTC_INT8, ENABLE);   //启用中断 
+    /* NVIC config */
+    NVIC_ClearPendingIRQ(INT008_IRQn);  //清除下事件 
+		
+    NVIC_SetPriority(INT008_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
+		NVIC_EnableIRQ(INT008_IRQn); // 
+		
+				    /* GPIO 367303 充电唤醒mcu   PA1 */
+    /* PA1 set to GPIO-Input */
+    (void)GPIO_StructInit(&stcGpioInit);
+    stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+		stcGpioInit.u16ExtInt =PIN_EXTINT_ON  ;
+    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_01, &stcGpioInit);
+
+
+		
+    /* ExtInt config */
+    (void)EXTINT_StructInit(&stcExtIntInit);
+    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
+    (void)EXTINT_Init(EXTINT_CH03, &stcExtIntInit);
+
+    /* IRQ sign-in */
+    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ1 ;
+    stcIrqSignConfig.enIRQn      = INT001_IRQn;
+    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA08_IrqCallback;
+    (void)INTC_IrqSignIn(&stcIrqSignConfig);
+
+    /* Disable all */
+    INTC_IntCmd(INTC_INT1, ENABLE);   //启用中断 
+    /* NVIC config */
+    NVIC_ClearPendingIRQ(INT001_IRQn);  //清除下事件 
+		
+    NVIC_SetPriority(INT001_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
+		NVIC_EnableIRQ(INT001_IRQn); // 
 
 		
 		GPIO_SetFunc(GPIO_PORT_B,GPIO_PIN_07,GPIO_FUNC_32);//USART3-TX
     
 }
 
+
+
+static Button btn1;
 static uint8_t read_button_gpio(uint8_t button_id)
 {
     switch (button_id) {
@@ -208,9 +241,15 @@ static uint8_t read_button_gpio(uint8_t button_id)
     }
 }
  uint8_t scree_id=0;
+extern  TimerHandle_t xScreen_off;
 void BTN1_SINGLE_CLICK_Callback(Button *btn)
 {
-			
+	if(CM_TMRA_1->CMPAR6==10)
+	{
+		CM_TMRA_1->CMPAR6=100;
+	}else{
+				xTimerStart(xScreen_off, 0);
+	
 		switch(scree_id++)
 		{
 			case 0:
@@ -225,9 +264,43 @@ void BTN1_SINGLE_CLICK_Callback(Button *btn)
 			break;
 			
 		}
+	}
+}
+
+//长按回调
+static void BTN1_LONG_HOLD(Button *btn)
+{
+	
+
+Run_STOP();
 	
 }
-static Button btn1;
+
+void Run_STOP(void)
+{
+			//进入停止模式
+	
+	
+	    TMRA_PWM_OutputCmd(CM_TMRA_1, TMRA_CH6, DISABLE);
+	DDL_DelayMS (500);
+	
+		stc_pwc_stop_mode_config_t stcStopConfig;
+    (void)PWC_STOP_StructInit(&stcStopConfig);
+
+    stcStopConfig.u8StopDrv = PWC_STOP_DRV_LOW;  //驱动能力
+    stcStopConfig.u16Clock = PWC_STOP_CLK_KEEP;
+    stcStopConfig.u16FlashWait = PWC_STOP_FLASH_WAIT_ON;
+
+    (void)PWC_STOP_Config(&stcStopConfig);
+
+    /* Wake-up source config (EXTINT Ch.1 here) */
+    INTC_WakeupSrcCmd(INTC_STOP_WKUP_EXTINT_CH8|INTC_STOP_WKUP_EXTINT_CH1 , ENABLE);  
+		PWC_STOP_Enter(PWC_STOP_WFI);  //进入停机 靠中断唤醒  
+	  TMRA_PWM_OutputCmd(CM_TMRA_1, TMRA_CH6, ENABLE);
+CM_TMRA_1->CMPAR6=100;
+	
+}
+
 void  Button_init(void)
 {
 	
@@ -236,6 +309,8 @@ void  Button_init(void)
 
 
 button_attach(&btn1,BTN_SINGLE_CLICK,BTN1_SINGLE_CLICK_Callback);
+	
+button_attach(&btn1,BTN_LONG_PRESS_START,BTN1_LONG_HOLD);
 	button_start(&btn1);
 }
 
@@ -266,10 +341,17 @@ int32_t main(void)
 //    LL_PERIPH_WP(LL_PERIPH_ALL);
 	LCD_Init ();
 //	LCD_Fill(0,0,LCD_W,LCD_H,BLACK); //灞忓箷缃负榛戣壊
-//	LCD_ShowChar(56,0,'V',0xF8E3,BLACK ,16,0);
-//LCD_ShowChar(56,16,'A',GRAYBLUE,BLACK ,16,0);
+//	LCD_ShowChar(0,0,'V',0xF8E3,BLACK ,16,0);
+//LCD_ShowChar(0,16,'A',GRAYBLUE,BLACK ,16,0);
+//	LCD_DrawLine(0,0,0,79,0xF8E3);
+//		LCD_DrawLine(0,0,159,0,0xF8E3);
+//			LCD_DrawLine(159,0,159,79,0xF8E3);
+//				LCD_DrawLine(159,79,0,79,0xF8E3);
 //LCD_ShowChar(136,0,'W',BRED,BLACK ,16,0);
 //	
+
+
+//DDL_DelayMS(20000);
 	 Button_init();
 
 

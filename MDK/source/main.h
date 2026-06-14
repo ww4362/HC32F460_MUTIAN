@@ -38,6 +38,10 @@ extern config_t  config;
  extern uint8_t scree_id;
 
 extern uint8_t Edit_Mode_Controls;
+
+
+
+void Run_STOP(void);
 //进入编辑模式的控件
 //1 .风扇温度
 #endif /* __MAIN_H__ */

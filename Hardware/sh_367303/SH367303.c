@@ -31,7 +31,7 @@ int8_t SH36730X_Init(void)
     stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
 		stcGpioInit.u16PinState = PIN_STAT_SET ;
 		stcGpioInit.u16PinDrv= PIN_HIGH_DRV;
-    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_00, &stcGpioInit);
+    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_04, &stcGpioInit);
 
     /* PA1 set to GPIO-Output SCL */
     (void)GPIO_StructInit(&stcGpioInit);
@@ -40,37 +40,37 @@ int8_t SH36730X_Init(void)
     stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
 		stcGpioInit.u16PinState = PIN_STAT_SET ;
 		stcGpioInit.u16PinDrv= PIN_HIGH_DRV;
-    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_01, &stcGpioInit);
+    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_03, &stcGpioInit);
 	
 	//pa3 报警中断
 			    /* GPIO initialize */
-    /* PA8 set to GPIO-Input */
-    (void)GPIO_StructInit(&stcGpioInit);
-    stcGpioInit.u16ExtInt = PIN_EXTINT_ON;
-    stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
-    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_03, &stcGpioInit);
+//    /* PA8 set to GPIO-Input */
+//    (void)GPIO_StructInit(&stcGpioInit);
+//    stcGpioInit.u16ExtInt = PIN_EXTINT_ON;
+//    stcGpioInit.u16PinAttr = PIN_ATTR_DIGITAL;
+//    (void)GPIO_Init(GPIO_PORT_A, GPIO_PIN_03, &stcGpioInit);
 
-		stc_extint_init_t stcExtIntInit;
-    stc_irq_signin_config_t stcIrqSignConfig;		
-		
-    /* ExtInt config */
-    (void)EXTINT_StructInit(&stcExtIntInit);
-    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
-    (void)EXTINT_Init(EXTINT_CH03, &stcExtIntInit);
+//		stc_extint_init_t stcExtIntInit;
+//    stc_irq_signin_config_t stcIrqSignConfig;		
+//		
+//    /* ExtInt config */
+//    (void)EXTINT_StructInit(&stcExtIntInit);
+//    stcExtIntInit.u32Edge = EXTINT_TRIG_FALLING  ;  //下降沿触发  
+//    (void)EXTINT_Init(EXTINT_CH03, &stcExtIntInit);
 
-    /* IRQ sign-in */
-    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ3 ;
-    stcIrqSignConfig.enIRQn      = INT003_IRQn;
-    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA03_IrqCallback;
-    (void)INTC_IrqSignIn(&stcIrqSignConfig);
+//    /* IRQ sign-in */
+//    stcIrqSignConfig.enIntSrc    = INT_SRC_PORT_EIRQ1 ;
+//    stcIrqSignConfig.enIRQn      = INT001_IRQn;
+//    stcIrqSignConfig.pfnCallback = &INT_SRC_GPIO_PA03_IrqCallback;
+//    (void)INTC_IrqSignIn(&stcIrqSignConfig);
 
-    /* Disable all */
-    INTC_IntCmd(INTC_INT3, ENABLE);   //启用中断 
-    /* NVIC config */
-    NVIC_ClearPendingIRQ(INT003_IRQn);  //清除下事件 
-		
-    NVIC_SetPriority(INT003_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
-		NVIC_EnableIRQ(INT003_IRQn); // 
+//    /* Disable all */
+//    INTC_IntCmd(INTC_INT1, ENABLE);   //启用中断 
+//    /* NVIC config */
+//    NVIC_ClearPendingIRQ(INT001_IRQn);  //清除下事件 
+//		
+//    NVIC_SetPriority(INT001_IRQn, DDL_IRQ_PRIO_00); //配置优先级 
+//		NVIC_EnableIRQ(INT001_IRQn); // 
 
 
 SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
@@ -101,7 +101,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     SH367303_SCONF_Struct.CADC_M = SH_CADC_M_CONTINUOUS;
     SH367303_SCONF_Struct.CBIT_C = SH_CBIT_13;
     SH367303_SCONF_Struct.VADC_EN = SH_VADC_EN;
-    SH367303_SCONF_Struct.VADC_C = SH_VADC_C_V;
+    SH367303_SCONF_Struct.VADC_C = SH_VADC_C_VT;
     SH367303_SCONF_Struct.SCAN_C = SH_SCAN_C_200mS;
     //SCONF4
     SH367303_SCONF_Struct.CB10 = SH_CB10_DIS;
@@ -122,7 +122,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     SH367303_SCONF_Struct.SCT = SH_SCT_50uS;
     //SCONF7
     SH367303_SCONF_Struct.OVT = SH_OVT_2;
-    SH367303_SCONF_Struct.CHS = SH_CHS_12mV;
+    SH367303_SCONF_Struct.CHS = SH_CHS_14mV;
     SH367303_SCONF_Struct.WDTT = SH_WDTT_30S;
     //SCONF8-9
     SH367303_SCONF_Struct.OVD = DSC_V_MAX;  //  充电保护电压
@@ -138,7 +138,7 @@ SH367303_INT_EN_TypeDef SH367303_INT_EN_Struct = {0};
     //配置 SH36730X 中断屏蔽选项
     SH367303_INT_EN_Struct.SC_INT = SH_SC_INT_DIS;
     SH367303_INT_EN_Struct.OV_INT = SH_OV_INT_DIS;
-    SH367303_INT_EN_Struct.CD_INT = SH_CD_INT_DIS;
+    SH367303_INT_EN_Struct.CD_INT = SH_CD_INT_EN;
     SH367303_INT_EN_Struct.CADC_INT = SH_CADC_INT_EN;
     SH367303_INT_EN_Struct.VADC_INT = SH_VADC_INT_DIS;
     SH367303_INT_EN_Struct.WDT_INT = SH_WDT_INT_DIS;
@@ -418,7 +418,7 @@ float SH36730X_Read_Current(void)
 		
 		
 		                Current = (1.0f * (float)data) / (8192.0f*2  * (float)SH367303_Rsens);
-                Current = -(Current * 1000.0f); //转换为mA
+                Current = (Current * 1000.0f); //转换为mA
 		
 //            break;
 //        default:

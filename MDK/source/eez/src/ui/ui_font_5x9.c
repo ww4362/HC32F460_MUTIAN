@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 10 px
  * Bpp: 1
- * Opts: --bpp 1 --size 10 --no-compress --font resource\5x9.ttf --symbols ° --range 32-127 --format lvgl
+ * Opts: --bpp 1 --size 10 --no-compress --font resource\5x9.ttf --symbols °- --range 32-127 --format lvgl
  ******************************************************************************/
 
 #ifdef __has_include

@@ -128,8 +128,8 @@ typedef struct
     #define SH_OV_INT_EN          0x00    //0：硬件过充电保护后，ALARM管脚不输出报警信号
     #define SH_OV_INT_DIS         0x40    //1：硬件过充电保护后，ALARM管脚输出报警信号
     //4 CD_INT 充放电状态中断使能位
-    #define SH_CD_INT_EN          0x00    //0：检测到充放电状态后，ALARM管脚不输出报警信号
-    #define SH_CD_INT_DIS         0x40    //1：检测到充放电状态后，ALARM管脚输出报警信号
+    #define SH_CD_INT_DIS          0x00    //0：检测到充放电状态后，ALARM管脚不输出报警信号
+    #define SH_CD_INT_EN         0x10    //1：检测到充放电状态后，ALARM管脚输出报警信号
     //3 CADC_INT CADC中断使能位
     #define SH_CADC_INT_DIS       0x00    //0：CADC转换完成后，ALARM管脚不输出报警信号
     #define SH_CADC_INT_EN     		0x40    //1：CADC转换完成后，ALARM管脚仅输出低电平脉冲

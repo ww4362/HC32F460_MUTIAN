@@ -89,9 +89,9 @@ BMS_ReturnTypeDef BMS_Read_Temp(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
 //    return BMS_OK;
 
 
-BMS->Status.Temperature[0] = 385 ;
-BMS->Status.Temperature[1] = 385 ;
-BMS->Status.Temperature[2] = 385 ;
+//BMS->Status.Temperature[0] = 385 ;
+//BMS->Status.Temperature[1] = 385 ;
+//BMS->Status.Temperature[2] = 385 ;
 return BMS_OK;
 
 }
@@ -199,6 +199,10 @@ BMS_ReturnTypeDef BMS_Read_Status(struct AFE_Device *pDev ,BMSTypeDef *BMS) {
  * @return  BMS_ReturnTypeDef 返回状态计算结果，BMS_OK 表示无报警
  */
 BMS_ReturnTypeDef BMS_Status_Cacluate(BMSTypeDef *BMS) {
+	//检测之前 把遗留数据清空掉 
+//	memset(& BMS->State.V_Alarm, 0, sizeof(BMS->State.V_Alarm));
+//	memset(& BMS->State.T_Alarm, 0, sizeof(BMS->State.T_Alarm));
+	
 //-----------------------单电池过压检测------------------------------------------*/
 	for (int i = 0; i < Battery_Count; ++i) 
     {
@@ -247,29 +251,38 @@ BMS_ReturnTypeDef BMS_Status_Cacluate(BMSTypeDef *BMS) {
             }
         }
     }
-//-----------------------充电 高温、低温监测------------------------------------------*/
-if (BMS->Status.SwitchStatus[CHGING])//充电状态 CADC检测到Sense电阻两端(RS2-RS1)电压≤-VCD；
-{
+		
+//-----------------------充电 电流检测-----------------------------------------*/		
+		if (BMS->Status.SwitchStatus[CHGING])
+		{
+			if(BMS->Status.Current>BAT_OverChargeCurrentWarn)
+			BMS->State.I_Alarm[OverChargeCurrentWarn]=true;
+			
+		}
+		
+		//-----------------------充电 高温、低温监测--- 充电作为全局 不区分充电高温还是放电高温 没意义---------------------------------------*/
+//if (BMS->Status.SwitchStatus[CHGING])//充电状态 CADC检测到Sense电阻两端(RS2-RS1)电压≤-VCD；
+//{
 	for (int i = 0; i < Temp_Count; ++i) //高温检测
     {
         if (BMS->Status.Temperature[i] > BAT_HighChargeTemperatureWarn) //充电 高温预警判断
 		{
             if (BMS->Status.Temperature[i] > BAT_HighChargeTemperatureAlarm) //充电 高温警告判断
             {
-                BMS->State.I_Alarm[ChargeHighTemperatureAlarm][i] = true;
-                BMS->State.I_Alarm[ChargeHighTemperatureWarn][i] = true;
+                BMS->State.T_Alarm[ChargeHighTemperatureAlarm][i] = true;
+                BMS->State.T_Alarm[ChargeHighTemperatureWarn][i] = true;
             } 
             else 
             {
-                BMS->State.I_Alarm[ChargeHighTemperatureWarn][i] = true;
+                BMS->State.T_Alarm[ChargeHighTemperatureWarn][i] = true;
             }
         } 
-        if (BMS->State.I_Alarm[ChargeHighTemperatureWarn][i] || BMS->State.I_Alarm[ChargeHighTemperatureAlarm][i])//是否已产生标志
+        if (BMS->State.T_Alarm[ChargeHighTemperatureWarn][i] || BMS->State.T_Alarm[ChargeHighTemperatureAlarm][i])//是否已产生标志
         {
             if (BMS->Status.Temperature[i] < BAT_HighChargeTemperatureRecovery) 
             { // 如果该通道低于恢复阈值
-                BMS->State.I_Alarm[ChargeHighTemperatureWarn][i] = false;
-                BMS->State.I_Alarm[ChargeHighTemperatureAlarm][i] = false;
+                BMS->State.T_Alarm[ChargeHighTemperatureWarn][i] = false;
+                BMS->State.T_Alarm[ChargeHighTemperatureAlarm][i] = false;
             }
         }
     }
@@ -279,74 +292,74 @@ if (BMS->Status.SwitchStatus[CHGING])//充电状态 CADC检测到Sense电阻两�
 		{
             if (BMS->Status.Temperature[i] < BAT_LowChargeTemperatureAlarm) //充电 低温警告判断
             {
-                BMS->State.I_Alarm[ChargeLowTemperatureAlarm][i] = true;
-                BMS->State.I_Alarm[ChargeLowTemperatureWarn][i] = true;
+                BMS->State.T_Alarm[ChargeLowTemperatureAlarm][i] = true;
+                BMS->State.T_Alarm[ChargeLowTemperatureWarn][i] = true;
             } 
             else 
             {
-                BMS->State.I_Alarm[ChargeLowTemperatureWarn][i] = true;
+                BMS->State.T_Alarm[ChargeLowTemperatureWarn][i] = true;
             }
         } 
-        if (BMS->State.I_Alarm[ChargeLowTemperatureWarn][i] || BMS->State.I_Alarm[ChargeLowTemperatureAlarm][i])//是否已产生标志
+        if (BMS->State.T_Alarm[ChargeLowTemperatureWarn][i] || BMS->State.T_Alarm[ChargeLowTemperatureAlarm][i])//是否已产生标志
         {
             if (BMS->Status.Temperature[i] > BAT_LowChargeTemperatureRecovery)
             { // 如果所有电池都低于恢复电压
-                BMS->State.I_Alarm[ChargeLowTemperatureWarn][i] = false;
-                BMS->State.I_Alarm[ChargeLowTemperatureAlarm][i] = false;
+                BMS->State.T_Alarm[ChargeLowTemperatureWarn][i] = false;
+                BMS->State.T_Alarm[ChargeLowTemperatureAlarm][i] = false;
             }
         }
     }
-}
-//-----------------------放电 高温、低温监测------------------------------------------*/
-if (BMS->Status.SwitchStatus[DSGING])//放电状态 CADC检测到Sense电阻两端(RS2-RS1)电压≥VCD；
-{
-	for (int i = 0; i < Temp_Count; ++i) //高温检测
-    {
-        if (BMS->Status.Temperature[i] > BAT_HighDischargeTemperatureWarn) //放电 高温预警判断
-		{
-            if (BMS->Status.Temperature[i] > BAT_HighDischargeTemperatureAlarm) //放电 高温警告判断
-            {
-                BMS->State.I_Alarm[DischargeHighTemperatureAlarm][i] = true;
-                BMS->State.I_Alarm[DischargeHighTemperatureWarn][i] = true;
-            } 
-            else 
-            {
-                BMS->State.I_Alarm[DischargeHighTemperatureWarn][i] = true;
-            }
-        } 
-        if (BMS->State.I_Alarm[DischargeHighTemperatureWarn][i] || BMS->State.I_Alarm[DischargeHighTemperatureAlarm][i])//是否已产生标志
-        {
-            if (BMS->Status.Temperature[i] > BAT_HighDischargeTemperatureRecovery) 
-            { // 如果所有电池都低于恢复电压
-                BMS->State.I_Alarm[DischargeHighTemperatureWarn][i] = false;
-                BMS->State.I_Alarm[DischargeHighTemperatureAlarm][i] = false;
-            }
-        }
-    }
-	for (int i = 0; i < Temp_Count; ++i) //低温检测
-    {
-        if (BMS->Status.Temperature[i] < BAT_LowDischargeTemperatureWarn) //放电 低温预警判断
-		{
-            if (BMS->Status.Temperature[i] < BAT_LowDischargeTemperatureAlarm) //放电 低温警告判断
-            {
-                BMS->State.I_Alarm[DischargeLowTemperatureAlarm][i] = true;
-                BMS->State.I_Alarm[DischargeLowTemperatureWarn][i] = true;
-            } 
-            else 
-            {
-                BMS->State.I_Alarm[DischargeLowTemperatureWarn][i] = true;
-            }
-        } 
-        if (BMS->State.I_Alarm[DischargeLowTemperatureWarn][i] || BMS->State.I_Alarm[DischargeLowTemperatureAlarm][i])//是否已产生标志
-        {
-            if (BMS->Status.Temperature[i] < BAT_LowDischargeTemperatureRecovery) 
-            { // 如果所有电池都低于恢复电压
-                BMS->State.I_Alarm[DischargeLowTemperatureWarn][i] = false;
-                BMS->State.I_Alarm[DischargeLowTemperatureAlarm][i] = false;
-            }
-        }
-    }
-}
+//}
+//-----------------------放电 高温、低温监测-----------------------------------------只做一个高温检测  充电作为全局 -*/
+//if (BMS->Status.SwitchStatus[DSGING])//放电状态 CADC检测到Sense电阻两端(RS2-RS1)电压≥VCD；
+//{
+//	for (int i = 0; i < Temp_Count; ++i) //高温检测
+//    {
+//        if (BMS->Status.Temperature[i] > BAT_HighDischargeTemperatureWarn) //放电 高温预警判断
+//		{
+//            if (BMS->Status.Temperature[i] > BAT_HighDischargeTemperatureAlarm) //放电 高温警告判断
+//            {
+//                BMS->State.T_Alarm[DischargeHighTemperatureAlarm][i] = true;
+//                BMS->State.T_Alarm[DischargeHighTemperatureWarn][i] = true;
+//            } 
+//            else 
+//            {
+//                BMS->State.T_Alarm[DischargeHighTemperatureWarn][i] = true;
+//            }
+//        } 
+//        if (BMS->State.T_Alarm[DischargeHighTemperatureWarn][i] || BMS->State.T_Alarm[DischargeHighTemperatureAlarm][i])//是否已产生标志
+//        {
+//            if (BMS->Status.Temperature[i] > BAT_HighDischargeTemperatureRecovery) 
+//            { // 如果所有电池都低于恢复电压
+//                BMS->State.T_Alarm[DischargeHighTemperatureWarn][i] = false;
+//                BMS->State.T_Alarm[DischargeHighTemperatureAlarm][i] = false;
+//            }
+//        }
+//    }
+//	for (int i = 0; i < Temp_Count; ++i) //低温检测
+//    {
+//        if (BMS->Status.Temperature[i] < BAT_LowDischargeTemperatureWarn) //放电 低温预警判断
+//		{
+//            if (BMS->Status.Temperature[i] < BAT_LowDischargeTemperatureAlarm) //放电 低温警告判断
+//            {
+//                BMS->State.T_Alarm[DischargeLowTemperatureAlarm][i] = true;
+//                BMS->State.T_Alarm[DischargeLowTemperatureWarn][i] = true;
+//            } 
+//            else 
+//            {
+//                BMS->State.T_Alarm[DischargeLowTemperatureWarn][i] = true;
+//            }
+//        } 
+//        if (BMS->State.T_Alarm[DischargeLowTemperatureWarn][i] || BMS->State.T_Alarm[DischargeLowTemperatureAlarm][i])//是否已产生标志
+//        {
+//            if (BMS->Status.Temperature[i] < BAT_LowDischargeTemperatureRecovery) 
+//            { // 如果所有电池都大于恢复温度 低温警告置零
+//                BMS->State.T_Alarm[DischargeLowTemperatureWarn][i] = false;
+//                BMS->State.T_Alarm[DischargeLowTemperatureAlarm][i] = false;
+//            }
+//        }
+//    }
+//}
     // 如果没有任何警告或报警，返回 BMS_OK
     return BMS_CheckAlarm(BMS);
 }
@@ -382,9 +395,12 @@ BMS_ReturnTypeDef BMS_CheckAlarm(BMSTypeDef *BMS) {
     }
 
     // 检查电流报警
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < Temp_Count; ++j) {
-            if (BMS->State.I_Alarm[i][j]) {
+    for (int i = 0; i < 4; ++i) {
+			
+			
+			
+
+            if (BMS->State.I_Alarm[i]) {
                 if (i == OverChargeCurrentAlarm || i == OverDischargeCurrentAlarm) {
                     hasAlarm = true;
                     #ifdef LOG_OUTPUT
@@ -397,12 +413,16 @@ BMS_ReturnTypeDef BMS_CheckAlarm(BMSTypeDef *BMS) {
                     #endif
                 }
             }
-        }
+       
     }
 
+		
+		
+ //      
     // 检查温度报警
-    for (int i = 0; i < 4; ++i) {
-        if (BMS->State.T_Alarm[i]) {
+    for (int i = 0; i < 8; ++i) {
+			 for (int j = 0; j < Temp_Count; ++j) {
+        if (BMS->State.T_Alarm[i][j]) {
             if (i == ChargeHighTemperatureAlarm || i == DischargeHighTemperatureAlarm ||
                 i == ChargeLowTemperatureAlarm || i == DischargeLowTemperatureAlarm) {
                 hasAlarm = true;
@@ -418,7 +438,7 @@ BMS_ReturnTypeDef BMS_CheckAlarm(BMSTypeDef *BMS) {
             }
         }
     }
-
+}
     return (hasAlarm ? BMS_Alarm : (hasWarning ? BMS_Warning : BMS_OK));
 }
 
