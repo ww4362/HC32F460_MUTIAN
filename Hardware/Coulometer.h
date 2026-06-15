@@ -14,6 +14,7 @@ uint32_t flash_count;	//flash写入次数
 uint32_t Cycle_Percentage;  //循环百分比  没消耗百分之1 该值增加1 	
 float Energy_max;     //当前最大能量
 float Remaining_Energy;   //剩余能量
+float efficiency;   //充放电效率 一开始为90%
 }CoulombCounter_flash_t;
 
 

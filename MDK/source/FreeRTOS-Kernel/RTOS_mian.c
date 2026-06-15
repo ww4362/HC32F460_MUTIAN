@@ -189,6 +189,7 @@ uint16_t sconf1;
 static void Data_ref(TimerHandle_t xTimer)
 {
 	static TickType_t OD_Time = 0;  //记录过放关闭时间
+	static uint8_t cb_flag=0; // 是否均衡标志位
 //	taskENTER_CRITICAL();
 //	BMS_Read_Voltage(dev,&BMS);
 
@@ -246,6 +247,18 @@ if(!BMS .Status.SwitchStatus[CHG])
  
 //均衡处理 
 cb();
+//检查均衡状态 有在均衡置标志位
+		cb_flag=0;
+		for(int i=0;i<Battery_Count;i++)
+		{
+			if(BMS.Status.CBxStatus[i])
+			{
+				cb_flag++;
+				break;
+			}
+		}
+
+
 static uint8_t wait=0;
 //温度保护  根据报警找哪个报警了  执行不同策略 过充是内部自动关闭充电管 所以不做处理 只处理过放 
 if(ret==BMS_Alarm)
@@ -253,7 +266,7 @@ if(ret==BMS_Alarm)
 	for(int i=0;i<Battery_Count;i++)
 	{
 		//过放报警
-		if(	BMS .State.V_Alarm[OverDischargeAlarm][i])
+		if(	BMS .State.V_Alarm[OverDischargeAlarm][i]&& !cb_flag)
 		{
 			//说明出现了过放 关闭放电管 放电管关闭可以经过二极管充 
 			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)&~0x02);
@@ -332,36 +345,13 @@ if( Countdown>=360)
 	
 }
 
-		
-//      DDL_DelayMS(2);
-//        SW6306_CapacityLoad();
-//      DDL_DelayMS(2);
-        
-//  
-
-
-
-		
-		
-//		if(BMS.Control.DSG==0 &&ret==BMS_OK)
-//		{
-//					//放电关闭 没警告就打开放电
-//			BMS_DSG(dev, &BMS,ON);
-//			BMS_Control_Update(dev, &BMS);
-//		}
-//		
-//		if(BMS.Control.CHG==0 &&ret==BMS_OK)
-//		{
-//			BMS_CHG(dev, &BMS,ON);
-//			BMS_Control_Update(dev, &BMS);
-//		}
 							
 			//	 状态判断 判断是否从充满
 			adc_mode=none;
 			for(int i=0; i<Battery_Count;i++)
 			{
 
-				if(BMS.Status .BAT_Voltage[i]<BAT_OverDischargeAlarm )
+				if(BMS.Status .BAT_Voltage[i]<=BAT_OverDischargeAlarm )
 				{
 				adc_mode=Low_battery;
 					break;
@@ -374,17 +364,11 @@ if( Countdown>=360)
 					}
 			}
 			//均衡状态不做容量结算
-		for(int j=0,i=0;i<Battery_Count;i++)
-{
-	if(!BMS.Status.CBxStatus[i])
-	{
-		j++;
-	}
-	if(j==5)
-	{
-		coulometer_ticks(BMS.Status.Current,BMS.Status.Pack_Voltage,adc_mode);
-	}
-}
+		if(!	cb_flag)
+		{
+			coulometer_ticks(BMS.Status.Current,BMS.Status.Pack_Voltage,adc_mode);
+			
+		}
 
 			
 
@@ -800,8 +784,7 @@ void lvgl_task(void *arg)
 						lv_label_set_text(objects.err,"err");
 					}
 					
-					sprintf(buf, "%u", CoulombCounter.CoulombCounter_flash.flash_count);   //读取flash写入次数
-					lv_label_set_text(objects.wf, buf);
+
 					
 					
 					if((SW6306_Status.vbus_chg&7)==SW6306_VBUS_CHG_RQST_5V)
@@ -849,8 +832,14 @@ void lvgl_task(void *arg)
 					lv_label_set_text(objects.cyp, buf);
 					sprintf(buf, "%u", CoulombCounter.healthy);   //健康度
 					lv_label_set_text(objects.hes, buf);
+
+					sprintf(buf, "%u", CoulombCounter.CoulombCounter_flash.flash_count);   //读取flash写入次数
+					lv_label_set_text(objects.wf, buf);
 					
-					
+
+					sprintf(buf, "%.0f", CoulombCounter.CoulombCounter_flash.efficiency*100);   //充放电效率
+											
+					lv_label_set_text(objects.eff, buf);
 						break;
 					
 					

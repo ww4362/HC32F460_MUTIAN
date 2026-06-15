@@ -21,6 +21,7 @@ void coulometer_init(void)
 		
 		
 		memset(&CoulombCounter.CoulombCounter_flash, 0, sizeof(CoulombCounter_flash_t));
+		CoulombCounter.CoulombCounter_flash.efficiency=0.90f;
 		
 
 //		CoulombCounter.CoulombCounter_flash.flash_count=0;
@@ -46,7 +47,7 @@ void coulometer_ticks(float cur ,uint16_t vol, enum adc_mode_t mode)
 	//大于13 说明是充电  电池计算的是放电容量  充电容量要比实际容量大 充电x98%的系数 放电不做修正
 	if(cur>13)
 	{
-		CoulombCounter.CoulombCounter_flash.Remaining_Energy+=(vol /1000.0f*cur/7200.0f*0.98);
+		CoulombCounter.CoulombCounter_flash.Remaining_Energy+=(vol /1000.0f*cur/7200.0f*CoulombCounter.CoulombCounter_flash.efficiency);
 		
 	}else if (cur<13)
 	{
@@ -114,7 +115,12 @@ switch(mode)
 		CoulombCounter.CoulombCounter_flash.Energy_max=CoulombCounter.CoulombCounter_flash.Remaining_Energy;
 	break;
 	case Low_battery : //没电
+		//修正效率系数  剩余能量/最大能量 
+	
+		CoulombCounter.CoulombCounter_flash.Energy_max-=CoulombCounter.CoulombCounter_flash.Remaining_Energy; //最大能量减去剩余能量 因为剩余的能量没了
 		CoulombCounter.CoulombCounter_flash.Remaining_Energy=0;
+	
+	
 	break;
 	case Charging: //充电中
 		

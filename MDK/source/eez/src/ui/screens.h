@@ -74,6 +74,7 @@ typedef struct _objects_t {
     lv_obj_t *enm;
     lv_obj_t *ree;
     lv_obj_t *cyp;
+    lv_obj_t *eff;
 } objects_t;
 
 extern objects_t objects;
