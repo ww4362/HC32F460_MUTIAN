@@ -238,6 +238,7 @@ struct SW6306_StatusTypedef
 #define SW6306_CTRG_EXTSYS_IBUSL        0xABU//外部系统端口电流低8位
 #define SW6306_CTRG_EXTSYS_IBUSH        0xACU//外部系统端口电流高4位
 
+#define SW6306_CTRG_RESET								0XD9U//复位芯片 连续写0x20 0x40 0x80复位
 //0x100~0x1FF区，全为控制寄存器
 #define SW6306_CTRG_DCHG0               0x100U//放电配置0
 #define SW6306_CTRG_DCHG1               0x101U//放电配置1
@@ -1328,6 +1329,7 @@ SW6306_RET SW6306_IbusForceCtrlSet(SW6306_ARGS(uint8_t status));    //设置是�
 //初始化
 SW6306_RET SW6306_Init(SW6306_NOARG);         //初始化，最好系统上电后立刻执行
 uint8_t SW6306_IsInitialized(void);             //检测SW6306是否已初始化过，须在SW6306_PowerLoad()后执行
+SW6306_RET SW6306_Reset(SW6306_NOARG);
 
 #ifdef __cplusplus
 }

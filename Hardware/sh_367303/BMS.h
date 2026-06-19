@@ -24,7 +24,7 @@
 //#define USING_SH367309
 #define USING_UART
 
-#define DSC_V_MAX   0x2C4	  //充电保护电压 寄存器值 x5.86 
+#define DSC_V_MAX   0x2C9	  //充电保护电压 寄存器值 x5.86 
 
 #define ON 1
 #define OFF 0
@@ -33,8 +33,8 @@
 	
 
 
-#define CB_SATRT_VOL   4100   //均衡启动电压 单位 mv
-#define CB_VD          10    //均衡电压差   单位 mv
+#define CB_SATRT_VOL   4140   //均衡启动电压 单位 mv
+#define CB_VD          3    //均衡电压差   单位 mv
 
 
 #define BAT_OverChargeWarn            4150  // 过充预警电压 4.15V

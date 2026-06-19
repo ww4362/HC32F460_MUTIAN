@@ -261,7 +261,7 @@ cb();
 
 static uint8_t wait=0;
 //温度保护  根据报警找哪个报警了  执行不同策略 过充是内部自动关闭充电管 所以不做处理 只处理过放 
-if(ret==BMS_Alarm)
+if(ret==BMS_Alarm && !cb_flag)
 {
 	for(int i=0;i<Battery_Count;i++)
 	{
@@ -306,11 +306,12 @@ if(ret==BMS_OK&&wait==0)
 			I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x03);  //充放电一起打开
 			xTimerStart( x10S_Countdown, 0);
 		
-	}
-	//充电管  只是充电管单独关闭了 
-	if(BMS .Status.SwitchStatus[CHG]==0)
+	}else if (BMS .Status.SwitchStatus[CHG]==0)
 	{
-		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x01);  //只需要打开充电即可
+	//充电管  只是充电管单独关闭了 
+
+		I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF2, ((uint8_t)sconf1)|0x03);  //也是同时打开充放电
+
 	}
 }
 wait = (wait == 0) ? 0 : (wait - 1);
@@ -348,6 +349,7 @@ if( Countdown>=360)
 							
 			//	 状态判断 判断是否从充满
 			adc_mode=none;
+
 			for(int i=0; i<Battery_Count;i++)
 			{
 
@@ -357,12 +359,14 @@ if( Countdown>=360)
 					break;
 				}
 				
-					if(adc_flag&0x400)
-					{
-						adc_mode=high_battery;
-						
-					}
+
 			}
+			if(adc_flag&0x400)
+			{
+				adc_mode=high_battery;
+				
+			}
+
 			//均衡状态不做容量结算
 		if(!	cb_flag)
 		{
@@ -516,18 +520,19 @@ void sort_asc(uint16_t  *arr, int len)
         }
     }
 }
-uint8_t  buff=0;
+
 static void cb(void)
 {
 	uint16_t BAT_Voltage [Battery_Count];
 	
 	static TickType_t last_tick = 0;
 	memcpy(BAT_Voltage, BMS.Status .BAT_Voltage, sizeof(BAT_Voltage));
-	
+	uint8_t  buff=0;
 	//第一步 电压排序
 	sort_asc(BAT_Voltage, Battery_Count);
 	if(((BAT_Voltage [Battery_Count-1]>CB_SATRT_VOL)) &&((xTaskGetTickCount() - last_tick) >= pdMS_TO_TICKS(32000)))
 	{
+		
 		for(int i=0;i<Battery_Count;i++)
 		{
 				if((BMS.Status .BAT_Voltage[i]-BAT_Voltage[0])> CB_VD)
@@ -538,9 +543,10 @@ static void cb(void)
 				}
 			
 			}
-		
+		if(buff)
+		{
 		 I2C_WriteRegByte_CRC8(SH_ADDR, SH_SCONF5, buff);   //写入寄存器
-			//记录下时间
+		}//记录下时间
 			  last_tick = xTaskGetTickCount();
 	}
 	
@@ -783,10 +789,26 @@ void lvgl_task(void *arg)
 					{
 						lv_label_set_text(objects.err,"err");
 					}
+					if(adc_flag&0x400)
+					{
+					lv_label_set_text(objects.cpro,"YES");	
+						}else{
+						lv_label_set_text(objects.cpro,"NO");
+						}
+						
+					sprintf(buf, "%u", BAT_OverDischargeAlarm);   //过放保护电压
+					lv_label_set_text(objects.prv, buf);
 					
-
-					
-					
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
 					if((SW6306_Status.vbus_chg&7)==SW6306_VBUS_CHG_RQST_5V)
 					{
 						sprintf(buf, "%u", 5);
@@ -817,8 +839,10 @@ void lvgl_task(void *arg)
 					lv_label_set_text(objects.opm, buf);
 					sprintf(buf, "%u", SW6306_BAT_FCV);   //浮充限制电压
 					lv_label_set_text(objects.fcv, buf);
-					sprintf(buf, "%u", BAT_OverDischargeAlarm);   //过放保护电压
-					lv_label_set_text(objects.prv, buf);
+					sprintf(buf, "%u", SW6306_ReadVBAT());   //电池电压
+					lv_label_set_text(objects.vbat, buf);
+					sprintf(buf, "%u", SW6306_ReadIBAT());   //电池电流
+					lv_label_set_text(objects.ibat, buf);
 					
 					
 					

@@ -229,8 +229,7 @@
                   },
                   "icon": "svg:page"
                 }
-              ],
-              "active": true
+              ]
             },
             {
               "type": "row",
@@ -250,7 +249,8 @@
                       "enableClose": false,
                       "icon": "svg:properties"
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1085,17 +1085,15 @@
         "0": {
           "1": {},
           "10": {},
-          "11": {
-            "$selected": true
-          }
+          "11": {}
         }
       },
       "transform": {
         "translate": {
-          "x": -338.6667175292969,
-          "y": -258.0000305175781
+          "x": -1007.6667175292969,
+          "y": -269.0000305175781
         },
-        "scale": 4
+        "scale": 9
       },
       "timeline": {
         "isEditorActive": false,
@@ -1108,16 +1106,19 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
+          "0": {
+            "$selected": true
+          },
           "1": {},
           "7": {}
         }
       },
       "transform": {
         "translate": {
-          "x": -294.66668701171875,
-          "y": -126
+          "x": -694.6666870117188,
+          "y": -212
         },
-        "scale": 4
+        "scale": 8
       },
       "timeline": {
         "isEditorActive": false,
@@ -1131,18 +1132,19 @@
       "selectionBack": {
         "0": {
           "10": {},
-          "16": {
+          "16": {},
+          "19": {},
+          "25": {
             "$selected": true
-          },
-          "19": {}
+          }
         }
       },
       "transform": {
         "translate": {
-          "x": -294.66668701171875,
-          "y": -126
+          "x": -462.60718863350985,
+          "y": -384.9821428571429
         },
-        "scale": 4
+        "scale": 8
       },
       "timeline": {
         "isEditorActive": false,
@@ -1174,7 +1176,7 @@
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
-  "flowZoom": 4,
+  "flowZoom": 8,
   "implementationLanguage": "C",
   "openDialogDefaultPath": "C:\\Users\\ww436\\Documents\\GitHub\\HC32F460_MUTIAN\\MDK\\source\\eez\\resource\\Rajdhani-Medium.ttf"
 }

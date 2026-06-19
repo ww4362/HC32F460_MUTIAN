@@ -901,11 +901,6 @@
           <GroupName>SH367303</GroupName>
           <Files>
             <File>
-              <FileName>BMS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\sh_367303\BMS.c</FilePath>
-            </File>
-            <File>
               <FileName>BMS.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Hardware\sh_367303\BMS.h</FilePath>
@@ -914,6 +909,11 @@
               <FileName>BMS_UART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Hardware\sh_367303\BMS_UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>BMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS.c</FilePath>
             </File>
             <File>
               <FileName>BMS_UART.h</FileName>
@@ -1921,11 +1921,6 @@
           <GroupName>SH367303</GroupName>
           <Files>
             <File>
-              <FileName>BMS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Hardware\sh_367303\BMS.c</FilePath>
-            </File>
-            <File>
               <FileName>BMS.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Hardware\sh_367303\BMS.h</FilePath>
@@ -1934,6 +1929,11 @@
               <FileName>BMS_UART.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Hardware\sh_367303\BMS_UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>BMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\sh_367303\BMS.c</FilePath>
             </File>
             <File>
               <FileName>BMS_UART.h</FileName>
